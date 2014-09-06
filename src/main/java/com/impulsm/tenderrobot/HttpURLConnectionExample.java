@@ -142,7 +142,7 @@ public class HttpURLConnectionExample {
     }
 
     private void loadRequest() throws IOException{
-        String url = "http://utender.ru/supplier/contests/lots/540137/request/32237/";
+        String url = "http://utender.ru/supplier/public-offers/lots/539816/request/32268/";
 
         HttpClientContext context = HttpClientContext.create();
         context.setCookieStore(cookieStore);
