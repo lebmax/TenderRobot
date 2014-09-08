@@ -125,7 +125,6 @@ public class HttpURLConnectionExample {
 //        login.addHeader("Origin", "http://utender.ru");
 //        login.addHeader("Content-Type", "application/x-www-form-urlencoded");
 //        login.addHeader("Referer", "http://utender.ru/");
-
         login.setEntity(form);
 
         HttpClientContext context = HttpClientContext.create();
@@ -141,12 +140,13 @@ public class HttpURLConnectionExample {
 
     }
 
-    private void loadRequest() throws IOException{
+    private void loadRequest() throws IOException {
         String url = "http://utender.ru/supplier/public-offers/lots/539816/request/32268/";
 
         HttpClientContext context = HttpClientContext.create();
         context.setCookieStore(cookieStore);
         HttpGet httpget = new HttpGet(url);
+        addGetHeaders(httpget);
 
         try (CloseableHttpResponse response = httpclient.execute(httpget, context)) {
 
@@ -183,20 +183,21 @@ public class HttpURLConnectionExample {
             //return params;
         }
     }
-    
-    
-    
-    private void addCommonHeaders(HttpPost method) {
-        method.addHeader("Host", "utender.ru");
-        method.addHeader("Connection", "keep-alive");
+
+    private void addPostHeaders(HttpPost method) {
         method.addHeader("Cache-Control", "max-age=0");
         method.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-        method.addHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.94 Safari/537.36");
-        method.addHeader("Accept-Encoding", "gzip,deflate");
         method.addHeader("Accept-Language", "ru,en-US;q=0.8,en;q=0.6");
         //addCookieHeader(method);
     }
 
+    private void addGetHeaders(HttpGet method) {
+        method.addHeader("Cache-Control", "max-age=0");
+        method.addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+        method.addHeader("Accept-Language", "ru,en-US;q=0.8,en;q=0.6");
+        method.addHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36");
+        //addCookieHeader(method);
+    }
 
     private void printResponseHeaders(HttpResponse resp) {
         Header[] headers = resp.getAllHeaders();
@@ -206,9 +207,8 @@ public class HttpURLConnectionExample {
         }
     }
 
-
     private Path saveResponse(byte[] response) throws IOException {
-        Path path = Paths.get("/home/vinichenkosa/Desktop/response.html");
+        Path path = Paths.get("/Users/vinichenkosa/Desktop/response.html");
         return Files.write(path, response);
     }
 
