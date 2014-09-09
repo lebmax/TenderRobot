@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jpa:entity-mappings id="_14102643571281" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_1.xsd" xmlns:ns4="http://nbmodeler.java.net" xmlns:jpa="http://java.sun.com/xml/ns/persistence/orm" xmlns:java="http://jcp.org/en/jsr/detail?id=270" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <jpa:entity class="Task" minimized="false" id="_1410264369240">
+        <jpa:attributes/>
+    </jpa:entity>
+    <jpa:diagram id="_14102643571292">
+        <plane elementRef="_14102643571281" id="_14102643571293_p">
+            <shape elementRef="_1410264369240" id="_1410264369240_gui">
+                <Bounds x="355.0" y="194.0" width="132.0" height="26.0"/>
+            </shape>
+        </plane>
+    </jpa:diagram>
+</jpa:entity-mappings>
