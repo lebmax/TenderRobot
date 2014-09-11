@@ -1,21 +1,34 @@
 <div ng-controller="IndexCtrl">
     <div class="row">
-        <div class="col-lg-1">Id</div>
-        <div class="col-lg-1">Url запроса</div>
-        <div class="col-lg-1">Ваша ставка</div>
-        <div class="col-lg-2">Дата начала аукциона</div>
-        <div class="col-lg-2">Время выполнения</div>
-        <div class="col-lg-2">Площадка</div>
-        <div class="col-lg-2">Тип запроса</div>
-    </div>
-    <div ng-repeat="t in tasks" class="row">
-        <div class="col-lg-1">{{t.id}}</div>
-        <div class="col-lg-1">{{t.url}}</div>
-        <div class="col-lg-1">{{t.bid}}</div>
-        <div class="col-lg-2">{{t.beginDate}}</div>
-        <div class="col-lg-2">{{t.endTime - t.startTime}}</div>
-        <div class="col-lg-2">{{t.auctionType.name}}</div>
-        <div class="col-lg-2">{{t.requestType.name}}</div>
-    </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Url запроса</th>
+                    <th>Ваша ставка</th>
+                    <th>Дата начала аукциона</th>
+                    <th>Время выполнения</th>
+                    <th>Площадка</th>
+                    <th>Тип запроса</th>
+                </tr>
+            </thead>
+            <tbody>
 
+            </tbody>
+            <tr ng-repeat="t in tasks">
+                <td>{{t.id}}</td>
+                <td>{{t.url}}</td>
+                <td>{{t.bid}}</td>
+                <td>{{t.beginDate}}</td>
+                <td>{{t.endTime - t.startTime}}</td>
+                <td>{{t.auctionType.name}}</td>
+                <td>{{t.requestType.name}}</td>
+            </tr>
+        </table>
+    </div>
+    <div class="row">
+        <div class="col-lg-2 col-lg-offset-5">
+            <a href="#/task" class="btn btn-primary active" role="button">Add new task</a>
+        </div>
+    </div>
 </div>
