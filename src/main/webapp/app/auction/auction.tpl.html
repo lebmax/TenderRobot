@@ -1,0 +1,39 @@
+<div ng-controller="AuctionCtrl">
+    <div class="row">
+<br/>
+        <form class="form-horizontal" role="form" name="form">
+            <div class="form-group" 
+                 ng-class="{'has-error': form.auctionName.$invalid && form.auctionName.$dirty,
+                            'has-success': !form.auctionName.$invalid}">
+                <label for="inputName" class="col-sm-2 control-label">Auction name:</label>
+                <div class="col-sm-5">
+                    <input type="text" class="form-control" placeholder="Auction name"
+                           id="inputName" name="auctionName" ng-model="auction.name" 
+                           required/>
+                </div>
+                <span ng-show="form.auctionUrl.$error.required && form.auctionName.$dirty" class="help-block">Enter auction name</span>
+            </div>
+            <div class="form-group"
+                 ng-class="{'has-error': form.auctionUrl.$error.required && form.auctionUrl.$dirty,
+                            'has-warning': form.auctionUrl.$error.url,
+                            'has-success': !form.auctionUrl.$invalid
+                            }">
+                <label for="inputUrl" class="col-sm-2 control-label">Auction url:</label>
+                <div class="col-sm-5">
+                    <input type="url" class="form-control" placeholder="Auction url"
+                           id="inputUrl" name="auctionUrl" ng-model="auction.url"
+                           required/>
+                </div>
+
+                <span ng-show="form.auctionUrl.$error.required && form.auctionUrl.$dirty" class="help-block">Enter auction url</span>
+                <span ng-show="form.auctionUrl.$error.url && form.auctionUrl.$dirty" class="help-block">This is not a valid url.</span>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <button type="submit" class="btn btn-primary" ng-click="create()"
+                            ng-disabled="form.$invalid">Create</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

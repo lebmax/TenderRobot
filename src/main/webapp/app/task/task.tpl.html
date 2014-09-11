@@ -1,0 +1,109 @@
+<div ng-controller="TaskCtrl">
+    <br/>
+    <div class="row">
+        <form class="form-horizontal" role="form" name="form">
+
+            <div class="form-group" ng-class="{'has-error': form.inputTaskUrl.$error.required && form.inputTaskUrl.$dirty,
+                                               'has-warning': form.inputTaskUrl.$error.url,
+                                               'has-success': !form.inputTaskUrl.$invalid}">
+                <label for="inputTaskUrl" class="col-sm-2 control-label">Адрес заявки: </label>
+                <div class="col-sm-5">
+                    <input type="url" class="form-control" id="inputTaskUrl" 
+                           name="inputTaskUrl" placeholder="URL" ng-model="task.url"
+                           required/>
+                </div>
+                <span ng-show="form.inputTaskUrl.$error.required && form.inputTaskUrl.$dirty" class="help-block">
+                    URL-адрес заяки должен быть заполнен
+                </span>
+                <span ng-show="form.inputTaskUrl.$error.url && form.inputTaskUrl.$dirty" class="help-block">
+                    Неверный формат URL
+                </span>
+            </div>
+            <div class="form-group" ng-class="{'has-error': form.inputBid.$invalid && form.inputBid.$dirty,
+                                               'has-success': !form.inputBid.$invalid}">
+                <label for="inputBid" class="col-sm-2 control-label">Ваша ставка: </label>
+                <div class="col-sm-5">
+                    <input type="text" class="form-control" id="inputBid" 
+                           placeholder="Ставка" name="inputBid" ng-model="task.bid"
+                           required/>
+                </div>
+                <span class="help-block" ng-show="form.inputBid.$error.required && form.inputBid.$dirty">
+                    Ставка  должна быть заполнена
+                </span>
+            </div>
+            
+            <div class="form-group" ng-class="{'has-error': form.beginDate.$invalid && form.beginDate.$dirty,
+                                               'has-success': !form.beginDate.$invalid}">
+                <label for="beginDate" class="col-sm-2 control-label">Дата подачи заявки: </label>
+                <div class="dropdown col-sm-5">
+                    <a class="dropdown-toggle" id="dropdown2" role="button" data-toggle="dropdown">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="beginDate"
+                                   data-ng-model="task.beginDate" id="beginDate"
+                                   required>
+                            <span class="input-group-addon">
+                                <i class="glyphicon glyphicon-calendar"></i>
+                            </span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <datetimepicker data-ng-model="task.beginDate" 
+                                        data-datetimepicker-config="{dropdownSelector: '#dropdown2', minuteStep: 1}"/>
+                    </ul>
+                </div>
+                <span class="help-block" ng-show="form.beginDate.$error.required && form.beginDate.$dirty">
+                    Дата начала проведения аукциона должна быть запонена
+                </span>
+            </div>
+
+            <!--Select auction-->
+            
+            <div class="form-group" ng-class="{'has-error': form.selectAuction.$invalid && form.selectAuction.$dirty,
+                                               'has-success': !form.selectAuction.$invalid && form.selectAuction.$dirty}">
+                <label for="selectAuction" class="col-sm-2 control-label">Выберите площадку: </label>
+                <div class="col-sm-5">
+                    <select class="form-control" id="selectAuction" 
+                            ng-model="task.auctionType" name="selectAuction"
+                            ng-options="a.name for a in auctions"
+                            required>
+                        <option value="">-- Выберите площадку --</option>
+                    </select>
+                </div>
+                <div class="col-sm-1"><a href="#/auction" class="btn btn-default btn-sm active" role="button">Add</a></div>
+                <span class="help-block" ng-show="form.selectAuction.$error.required && form.selectAuction.$dirty">
+                    Необходимо выбрать тип площадки
+                </span>
+            </div>
+            
+            <!--Select request type-->
+            
+            <div class="form-group" ng-class="{'has-error': form.selectRequestType.$invalid && form.selectRequestType.$dirty,
+                                               'has-success': !form.selectRequestType.$invalid && form.selectRequestType.$dirty}">
+                <label for="selectRequestType" class="col-sm-2 control-label">Выберите тип тендера: </label>
+                <div class="col-sm-5">
+                    <select class="form-control" id="selectRequestType" 
+                            ng-model="task.requestType" name="selectRequestType"
+                            ng-options="rt.name for rt in requestTypes"
+                            required>
+                        <option value="">-- Выберите тип тендера --</option>
+                    </select>
+                </div>
+                <div class="col-sm-1"><a href="#/request" class="btn btn-default btn-sm active" role="button">Add</a></div>
+                <span class="help-block" ng-show="form.selectRequestType.$error.required && form.selectRequestType.$dirty">
+                    Необходимо выбрать тип запроса
+                </span>
+            </div>
+            
+            <!--Submit button-->
+            
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default" ng-click="create()"
+                            ng-disabled="!form.$valid || 
+                                         !form.selectRequestType.$dirty ||
+                                         !form.selectAuction.$dirty">Create</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<div ng-controller="IndexCtrl">
+    <div class="row">
+        <div class="col-lg-1">Id</div>
+        <div class="col-lg-1">Url запроса</div>
+        <div class="col-lg-1">Ваша ставка</div>
+        <div class="col-lg-2">Дата начала аукциона</div>
+        <div class="col-lg-2">Время выполнения</div>
+        <div class="col-lg-2">Площадка</div>
+        <div class="col-lg-2">Тип запроса</div>
+    </div>
+    <div ng-repeat="t in tasks" class="row">
+        <div class="col-lg-1">{{t.id}}</div>
+        <div class="col-lg-1">{{t.url}}</div>
+        <div class="col-lg-1">{{t.bid}}</div>
+        <div class="col-lg-2">{{t.beginDate}}</div>
+        <div class="col-lg-2">{{t.endTime - t.startTime}}</div>
+        <div class="col-lg-2">{{t.auctionType.name}}</div>
+        <div class="col-lg-2">{{t.requestType.name}}</div>
+    </div>
+
+</div>
