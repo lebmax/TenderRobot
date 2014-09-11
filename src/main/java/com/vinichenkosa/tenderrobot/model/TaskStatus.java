@@ -1,4 +1,4 @@
-package com.impulsm.tenderrobot.model;
+package com.vinichenkosa.tenderrobot.model;
 
 import java.io.Serializable;
 
@@ -8,9 +8,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
-public  class AuctionType implements Serializable {
+@XmlRootElement
+public  class TaskStatus implements Serializable {
 
 
     @Column(nullable=false)
@@ -23,12 +25,7 @@ public  class AuctionType implements Serializable {
     @Basic
     private String name;
 
-
-    @Column(nullable=false)
-    @Basic
-    private String url;
-
-    public AuctionType(){
+    public TaskStatus(){
 
     }
 
@@ -51,17 +48,6 @@ public  class AuctionType implements Serializable {
 
   public void setName (String name) {
         this.name = name;
-    }
-
-
-
-   public String getUrl() {
-        return this.url;
-    }
-
-
-  public void setUrl (String url) {
-        this.url = url;
     }
 
 }

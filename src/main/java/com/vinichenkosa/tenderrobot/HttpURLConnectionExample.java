@@ -1,4 +1,4 @@
-package com.impulsm.tenderrobot;
+package com.vinichenkosa.tenderrobot;
 
 import com.impulsm.signatureutils.container.PKCS7Container;
 import com.impulsm.signatureutils.exceptions.KeystoreInitializationException;

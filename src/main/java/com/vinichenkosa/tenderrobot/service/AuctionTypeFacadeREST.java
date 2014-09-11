@@ -1,12 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+package com.vinichenkosa.tenderrobot.service;
 
-package com.impulsm.tenderrobot.service;
-
-import com.impulsm.tenderrobot.model.AuctionType;
+import com.vinichenkosa.tenderrobot.model.AuctionType;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -20,10 +14,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-/**
- *
- * @author vinichenkosa
- */
 @Stateless
 @Path("auction")
 public class AuctionTypeFacadeREST extends AbstractFacade<AuctionType> {
@@ -63,7 +53,7 @@ public class AuctionTypeFacadeREST extends AbstractFacade<AuctionType> {
 
     @GET
     @Override
-    @Produces({"application/json"})
+    @Produces({"application/xml", "application/json"})
     public List<AuctionType> findAll() {
         return super.findAll();
     }

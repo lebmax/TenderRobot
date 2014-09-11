@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.impulsm.tenderrobot.service;
+package com.vinichenkosa.tenderrobot.service;
 
 import java.util.List;
 import javax.persistence.EntityManager;

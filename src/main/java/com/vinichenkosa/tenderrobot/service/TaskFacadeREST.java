@@ -1,14 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.impulsm.tenderrobot.service;
+package com.vinichenkosa.tenderrobot.service;
 
-import com.impulsm.tenderrobot.model.AuctionType;
-import com.impulsm.tenderrobot.model.RequestType;
-import com.impulsm.tenderrobot.model.Task;
-import java.util.Date;
+import com.vinichenkosa.tenderrobot.model.AuctionType;
+import com.vinichenkosa.tenderrobot.model.RequestType;
+import com.vinichenkosa.tenderrobot.model.Task;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -23,10 +17,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-/**
- *
- * @author vinichenkosa
- */
 @Stateless
 @Path("task")
 public class TaskFacadeREST extends AbstractFacade<Task> {
@@ -98,5 +88,5 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     protected EntityManager getEntityManager() {
         return em;
     }
-
+    
 }

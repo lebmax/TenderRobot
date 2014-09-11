@@ -2,10 +2,10 @@
 <persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
   <persistence-unit name="TenderRobotPU" transaction-type="JTA">
     <jta-data-source>java:/jdbc/TenderRobotDS</jta-data-source>
-    <class>com.impulsm.tenderrobot.model.Task</class>
-    <class>com.impulsm.tenderrobot.model.RequestType</class>
-    <class>com.impulsm.tenderrobot.model.AuctionType</class>
-    <class>com.impulsm.tenderrobot.model.TaskStatus</class>
+    <class>com.vinichenkosa.tenderrobot.model.Task</class>
+    <class>com.vinichenkosa.tenderrobot.model.RequestType</class>
+    <class>com.vinichenkosa.tenderrobot.model.TaskStatus</class>
+    <class>com.vinichenkosa.tenderrobot.model.AuctionType</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
     </properties>
