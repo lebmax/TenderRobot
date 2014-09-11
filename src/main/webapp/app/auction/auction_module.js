@@ -40,7 +40,7 @@ auctionModule.factory('AuctionFacade', function ($http) {
         return $http({
             method: "GET",
             withCredentials: true,
-            url: "http://localhost:8080/TenderRobot/webresources/auction"
+            url: "./webresources/auction"
         });
     };
     
@@ -49,7 +49,7 @@ auctionModule.factory('AuctionFacade', function ($http) {
             method: "POST",
             data: auction,
             withCredentials: true,
-            url: "http://localhost:8080/TenderRobot/webresources/auction"
+            url: "./webresources/auction"
         });
     };
     

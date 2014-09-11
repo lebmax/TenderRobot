@@ -68,7 +68,7 @@ taskModule.factory("TaskFacade", function ($http) {
         return $http({
             method: "GET",
             withCredentials: true,
-            url: "http://localhost:8080/TenderRobot/webresources/task"
+            url: "./webresources/task"
         });
     };
 
@@ -76,7 +76,7 @@ taskModule.factory("TaskFacade", function ($http) {
         return $http({
             method: "POST",
             withCredentials: true,
-            url: "http://localhost:8080/TenderRobot/webresources/task",
+            url: "./webresources/task",
             data: task
         });
     };

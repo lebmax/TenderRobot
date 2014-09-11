@@ -39,7 +39,7 @@ requestModule.factory('RequestTypeFacade', function ($http) {
         return $http({
             method: "GET",
             withCredentials: true,
-            url: "http://localhost:8080/TenderRobot/webresources/request_type"
+            url: "./webresources/request_type"
         });
     };
     
@@ -48,7 +48,7 @@ requestModule.factory('RequestTypeFacade', function ($http) {
             method: "POST",
             data: request,
             withCredentials: true,
-            url: "http://localhost:8080/TenderRobot/webresources/request_type"
+            url: "./webresources/request_type"
         });
     };
     
