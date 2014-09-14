@@ -12,6 +12,8 @@ requestModule.controller("RequestCtrl", function ($scope, RequestType, RequestTy
         });
     };
     
+    $scope.findAll();
+    
     $scope.create = function(){
         console.log($scope.requestType);
         RequestTypeFacade.create($scope.requestType)
@@ -20,6 +22,20 @@ requestModule.controller("RequestCtrl", function ($scope, RequestType, RequestTy
             $location.path("/task");
         }).error(function(data, status){
             console.log("Error saving request type. Error: "+data+" Status: "+status);
+        });
+    };
+    
+     $scope.delete = function (requestType) {
+        RequestTypeFacade.delete(requestType).success(function () {
+            var index = $scope.requestTypes.indexOf(requestType);
+
+            if (index > -1) {
+                $scope.requestTypes.splice(index, 1);
+            }
+        }).error(function (data, status) {
+
+            console.log("Ошибка при удалении типа запроса: " + requestType.name + ". Status: " + status);
+
         });
     };
 });
@@ -43,15 +59,22 @@ requestModule.factory('RequestTypeFacade', function ($http) {
         });
     };
     
-    requestTypeFacade.create = function (request) {
+    requestTypeFacade.create = function (requestType) {
         return $http({
             method: "POST",
-            data: request,
+            data: requestType,
             withCredentials: true,
             url: "./webresources/request_type"
         });
     };
     
+    requestTypeFacade.delete = function (requestType) {
+        return $http({
+            method: "DELETE",
+            withCredentials: true,
+            url: "./webresources/request_type/"+requestType.id
+        });
+    };
     
     return requestTypeFacade;
 });

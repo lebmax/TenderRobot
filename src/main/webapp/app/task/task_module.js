@@ -80,6 +80,14 @@ taskModule.factory("TaskFacade", function ($http) {
             data: task
         });
     };
+    
+    taskFacade.delete = function (task) {
+        return $http({
+            method: "DELETE",
+            withCredentials: true,
+            url: "./webresources/task/"+task.id
+        });
+    };
 
     return taskFacade;
 });

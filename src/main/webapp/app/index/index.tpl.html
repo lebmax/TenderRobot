@@ -10,6 +10,8 @@
                     <th>Время выполнения</th>
                     <th>Площадка</th>
                     <th>Тип запроса</th>
+                    <th>Статус</th>
+                    <th>Del</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,6 +25,9 @@
                 <td>{{t.endTime - t.startTime}}</td>
                 <td>{{t.auctionType.name}}</td>
                 <td>{{t.requestType.name}}</td>
+                <td>{{t.status.name}}</td>
+                <td><a href="" ng-click="delete(t)"><span class="glyphicon glyphicon-remove"></span></a></td>
+                
             </tr>
         </table>
     </div>

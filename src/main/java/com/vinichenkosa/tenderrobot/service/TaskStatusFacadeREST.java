@@ -15,7 +15,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 @Stateless
-@Path("taskstatus")
+@Path("task_status")
 public class TaskStatusFacadeREST extends AbstractFacade<TaskStatus> {
     @PersistenceContext(unitName = "TenderRobotPU")
     private EntityManager em;

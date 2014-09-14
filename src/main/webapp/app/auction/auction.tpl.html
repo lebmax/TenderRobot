@@ -1,13 +1,13 @@
 <div ng-controller="AuctionCtrl">
     <div class="row">
-<br/>
+        <br/>
         <form class="form-horizontal" role="form" name="form">
             <div class="form-group" 
                  ng-class="{'has-error': form.auctionName.$invalid && form.auctionName.$dirty,
                             'has-success': !form.auctionName.$invalid}">
-                <label for="inputName" class="col-sm-2 control-label">Auction name:</label>
+                <label for="inputName" class="col-sm-2 control-label">Название площадки:</label>
                 <div class="col-sm-5">
-                    <input type="text" class="form-control" placeholder="Auction name"
+                    <input type="text" class="form-control" placeholder="Название площадки"
                            id="inputName" name="auctionName" ng-model="auction.name" 
                            required/>
                 </div>
@@ -18,9 +18,9 @@
                             'has-warning': form.auctionUrl.$error.url,
                             'has-success': !form.auctionUrl.$invalid
                             }">
-                <label for="inputUrl" class="col-sm-2 control-label">Auction url:</label>
+                <label for="inputUrl" class="col-sm-2 control-label">Url-адрес площадки:</label>
                 <div class="col-sm-5">
-                    <input type="url" class="form-control" placeholder="Auction url"
+                    <input type="url" class="form-control" placeholder="Url-адрес площадки"
                            id="inputUrl" name="auctionUrl" ng-model="auction.url"
                            required/>
                 </div>
@@ -30,10 +30,36 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-5">
+                    <a href="#/task" class="btn btn-primary">Назад</a>
                     <button type="submit" class="btn btn-primary" ng-click="create()"
-                            ng-disabled="form.$invalid">Create</button>
+                            ng-disabled="form.$invalid">Создать</button>
+                    
                 </div>
+                
             </div>
+            
         </form>
+    </div>
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Ид-р</th>
+                    <th>Название площадки</th>
+                    <th>Url адрес площадки</th>
+                    <th>Del</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+            <tr ng-repeat="a in auctions">
+                <td>{{a.id}}</td>
+                <td>{{a.name}}</td>
+                <td>{{a.url}}</td>
+                <td><a href="" ng-click="delete(a)"><span class="glyphicon glyphicon-remove"></span></a></td>
+                
+            </tr>
+        </table>
     </div>
 </div>

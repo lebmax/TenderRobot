@@ -2,24 +2,39 @@ var auctionModule = angular.module('auctionModule', []);
 
 auctionModule.controller("AuctionCtrl", function ($scope, Auction, AuctionFacade, $location) {
     $scope.auction = Auction;
-    
-    $scope.findAll = function(){
+
+    $scope.findAll = function () {
         AuctionFacade.findAll()
-        .success(function(data){
-            $scope.auctions = data;
-        }).error(function(data, status){
-            console.log("Auctions not found. Error: "+data+" Status: "+status);
+                .success(function (data) {
+                    $scope.auctions = data;
+                }).error(function (data, status) {
+            console.log("Auctions not found. Error: " + data + " Status: " + status);
         });
     };
-    
-    $scope.create = function(){
+    $scope.findAll();
+
+    $scope.create = function () {
         console.log($scope.auction);
         AuctionFacade.create($scope.auction)
-        .success(function(data){
-            console.log("Auction was saved.");
-            $location.path("/task");
-        }).error(function(data, status){
-            console.log("Error saving auction. Error: "+data+" Status: "+status);
+                .success(function (data) {
+                    console.log("Auction was saved.");
+                    $location.path("/task");
+                }).error(function (data, status) {
+            console.log("Error saving auction. Error: " + data + " Status: " + status);
+        });
+    };
+
+    $scope.delete = function (auction) {
+        AuctionFacade.delete(auction).success(function () {
+            var index = $scope.auctions.indexOf(auction);
+
+            if (index > -1) {
+                $scope.auctions.splice(index, 1);
+            }
+        }).error(function (data, status) {
+
+            console.log("Ошибка при удалении площадки: " + auction.name + ". Status: " + status);
+
         });
     };
 });
@@ -35,7 +50,7 @@ auctionModule.factory('Auction', function () {
 
 auctionModule.factory('AuctionFacade', function ($http) {
     var auctionFacade = {};
-    
+
     auctionFacade.findAll = function () {
         return $http({
             method: "GET",
@@ -43,7 +58,7 @@ auctionModule.factory('AuctionFacade', function ($http) {
             url: "./webresources/auction"
         });
     };
-    
+
     auctionFacade.create = function (auction) {
         return $http({
             method: "POST",
@@ -52,7 +67,14 @@ auctionModule.factory('AuctionFacade', function ($http) {
             url: "./webresources/auction"
         });
     };
-    
-    
+
+    auctionFacade.delete = function (auction) {
+        return $http({
+            method: "DELETE",
+            withCredentials: true,
+            url: "./webresources/auction/"+auction.id
+        });
+    };
+
     return auctionFacade;
 });
