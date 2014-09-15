@@ -57,7 +57,13 @@ taskModule.factory("Task", function () {
             id: null,
             name: null,
             url: null
+        },
+        status: {
+            id: null,
+            code: 1,
+            name: null
         }
+        
     };
     return task;
 });

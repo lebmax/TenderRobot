@@ -43,6 +43,7 @@ taskStatusModule.controller("TaskStatusCtrl", function ($scope, TaskStatus, Task
 taskStatusModule.factory('TaskStatus', function () {
     var taskStatus = {
         id: null,
+        code: null,
         name: null
     };
     return taskStatus;

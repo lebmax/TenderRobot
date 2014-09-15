@@ -8,47 +8,54 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 @Entity
-@XmlRootElement
-public  class TaskStatus implements Serializable {
+@NamedQueries(value = {
+@NamedQuery(name = "TaskStatus.findByCode", query = "select s from TaskStatus s where s.code = :code")
+})
+public class TaskStatus implements Serializable {
 
+    @Column(unique = true, nullable = false)
+    @Basic
+    private int code;
 
-    @Column(nullable=false)
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
-
-
-    @Column(nullable=false)
+    @Column(nullable = false)
     @Basic
     private String name;
 
-    public TaskStatus(){
+    @Column(nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    public TaskStatus() {
 
     }
 
-
-   public Long getId() {
-        return this.id;
+    public int getCode() {
+        return this.code;
     }
 
-
-  public void setId (Long id) {
-        this.id = id;
+    public void setCode(int code) {
+        this.code = code;
     }
 
-
-
-   public String getName() {
+    public String getName() {
         return this.name;
     }
 
-
-  public void setName (String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-}
+    public Long getId() {
+        return this.id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+}

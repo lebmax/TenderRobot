@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -16,7 +18,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
 @XmlRootElement
+@NamedQueries(value = {
+    @NamedQuery(name = "Task.findByStatusCode", query = "select t from Task t where t.status.code = :code")
+})
 public class Task implements Serializable {
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Basic
+    private Date beginDate;
+
+    @OneToOne(targetEntity = RequestType.class)
+    private RequestType requestType;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
@@ -27,19 +39,9 @@ public class Task implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(targetEntity = TaskStatus.class)
-    private TaskStatus status;
-
-    @OneToOne(targetEntity = RequestType.class)
-    private RequestType requestType;
-
     @Temporal(TemporalType.TIMESTAMP)
     @Basic
     private Date endTime;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Basic
-    private Date beginDate;
 
     @OneToOne(targetEntity = AuctionType.class)
     private AuctionType auctionType;
@@ -51,8 +53,27 @@ public class Task implements Serializable {
     @Basic
     private String url;
 
+    @OneToOne(targetEntity = TaskStatus.class)
+    private TaskStatus status;
+
     public Task() {
 
+    }
+
+    public Date getBeginDate() {
+        return this.beginDate;
+    }
+
+    public void setBeginDate(Date beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public RequestType getRequestType() {
+        return this.requestType;
+    }
+
+    public void setRequestType(RequestType requestType) {
+        this.requestType = requestType;
     }
 
     public Date getStartTime() {
@@ -71,36 +92,12 @@ public class Task implements Serializable {
         this.id = id;
     }
 
-    public TaskStatus getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(TaskStatus status) {
-        this.status = status;
-    }
-
-    public RequestType getRequestType() {
-        return this.requestType;
-    }
-
-    public void setRequestType(RequestType requestType) {
-        this.requestType = requestType;
-    }
-
     public Date getEndTime() {
         return this.endTime;
     }
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
-    }
-
-    public Date getBeginDate() {
-        return this.beginDate;
-    }
-
-    public void setBeginDate(Date beginDate) {
-        this.beginDate = beginDate;
     }
 
     public AuctionType getAuctionType() {
@@ -125,6 +122,14 @@ public class Task implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public TaskStatus getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
     }
 
 }

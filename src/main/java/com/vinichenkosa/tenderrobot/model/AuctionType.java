@@ -14,57 +14,45 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public  class AuctionType implements Serializable {
 
-
-    @Column(nullable=false)
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
-
-
-    @Column(nullable=false)
+    @Column(nullable = false)
     @Basic
     private String name;
 
+    @Column(nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     @Basic
     private String url;
 
-    public AuctionType(){
+    public AuctionType() {
 
     }
 
-
-   public Long getId() {
-        return this.id;
-    }
-
-
-  public void setId (Long id) {
-        this.id = id;
-    }
-
-
-
-   public String getName() {
+    public String getName() {
         return this.name;
     }
 
-
-  public void setName (String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
+    public Long getId() {
+        return this.id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-   public String getUrl() {
+    public String getUrl() {
         return this.url;
     }
 
-
-  public void setUrl (String url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 
 }
-

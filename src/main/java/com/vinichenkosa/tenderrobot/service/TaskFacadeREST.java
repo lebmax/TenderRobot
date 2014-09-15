@@ -3,11 +3,13 @@ package com.vinichenkosa.tenderrobot.service;
 import com.vinichenkosa.tenderrobot.model.AuctionType;
 import com.vinichenkosa.tenderrobot.model.RequestType;
 import com.vinichenkosa.tenderrobot.model.Task;
+import com.vinichenkosa.tenderrobot.model.TaskStatus;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -27,6 +29,8 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     private RequestTypeFacadeREST requests;
     @Inject
     private AuctionTypeFacadeREST auctions;
+    @Inject
+    private TaskStatusFacadeREST statuses;
 
     public TaskFacadeREST() {
         super(Task.class);
@@ -38,8 +42,11 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     public void create(Task entity) {
         RequestType request = requests.find(entity.getRequestType().getId());
         AuctionType auction = auctions.find(entity.getAuctionType().getId());
+        TaskStatus status = statuses.findByCode(entity.getStatus().getCode());
+        
         entity.setAuctionType(auction);
         entity.setRequestType(request);
+        entity.setStatus(status);
         super.create(entity);
     }
 
@@ -83,7 +90,13 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
     public String countREST() {
         return String.valueOf(super.count());
     }
-
+    
+    public List<Task> findByStatusCode(){
+        TypedQuery<Task> q = getEntityManager().createNamedQuery("Task.findByStatusCode", Task.class);
+        q.setParameter("code", 1);
+        return q.getResultList();
+    }
+    
     @Override
     protected EntityManager getEntityManager() {
         return em;

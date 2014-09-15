@@ -1,24 +1,26 @@
 package com.vinichenkosa.tenderrobot.timers;
 
-import com.vinichenkosa.tenderrobot.model.utender.UtenderDateTime;
+import com.vinichenkosa.tenderrobot.model.Task;
+import com.vinichenkosa.tenderrobot.service.TaskFacadeREST;
 import java.io.IOException;
+import java.util.List;
 import javax.ejb.Schedule;
 import javax.ejb.Stateless;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.joda.time.LocalTime;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
 public class Timer {
 
+    @Inject
+    private TaskFacadeREST taskFacade;
+    
     @Schedule(hour = "*", minute = "*", second = "*/15", persistent = false)
     public void myTimer() throws IOException {
-        logger.info("Test1");
+        logger.info("timer started");
+        List<Task> activeTasks = taskFacade.findByStatusCode();
+        logger.info("{} acyive tasks founded.", activeTasks.size());
         
     }
 

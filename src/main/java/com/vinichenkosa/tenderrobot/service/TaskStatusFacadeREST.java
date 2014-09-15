@@ -50,6 +50,13 @@ public class TaskStatusFacadeREST extends AbstractFacade<TaskStatus> {
     public TaskStatus find(@PathParam("id") Long id) {
         return super.find(id);
     }
+    
+    public TaskStatus findByCode(Integer code) {
+        return getEntityManager().createNamedQuery("TaskStatus.findByCode", TaskStatus.class).
+                setParameter("code", code).
+                getSingleResult();
+    
+    }
 
     @GET
     @Override

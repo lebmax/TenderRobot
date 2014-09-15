@@ -12,43 +12,35 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
 @XmlRootElement
-public  class RequestType implements Serializable {
+public class RequestType implements Serializable {
 
-
-    @Column(nullable=false)
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
-
-
-    @Column(nullable=false)
+    @Column(nullable = false)
     @Basic
     private String name;
 
-    public RequestType(){
+    @Column(nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    public RequestType() {
 
     }
 
-
-   public Long getId() {
-        return this.id;
-    }
-
-
-  public void setId (Long id) {
-        this.id = id;
-    }
-
-
-
-   public String getName() {
+    public String getName() {
         return this.name;
     }
 
-
-  public void setName (String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-}
+    public Long getId() {
+        return this.id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+}
