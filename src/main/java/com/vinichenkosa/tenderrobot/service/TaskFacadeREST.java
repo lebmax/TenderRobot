@@ -91,9 +91,9 @@ public class TaskFacadeREST extends AbstractFacade<Task> {
         return String.valueOf(super.count());
     }
     
-    public List<Task> findByStatusCode(){
+    public List<Task> findByStatusCode(int code){
         TypedQuery<Task> q = getEntityManager().createNamedQuery("Task.findByStatusCode", Task.class);
-        q.setParameter("code", 1);
+        q.setParameter("code", code);
         return q.getResultList();
     }
     

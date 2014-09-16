@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @XmlRootElement
 @NamedQueries(value = {
-    @NamedQuery(name = "Task.findByStatusCode", query = "select t from Task t where t.status.code = :code")
+    @NamedQuery(name = "Task.findByStatusCode", query = "select t from Task t where t.status.code = :code order by t.beginDate asc")
 })
 public class Task implements Serializable {
 
