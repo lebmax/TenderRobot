@@ -1,12 +1,12 @@
 package com.vinichenkosa.tenderrobot.model.utender;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import javax.xml.bind.annotation.XmlElement;
 
 public class UtenderDateTime {
     
-    @JsonProperty(value = "Date")
+    @XmlElement(name = "Date")
     private String date;
-    @JsonProperty(value =  "Time")
+    @XmlElement(name = "Time")
     private String time;
 
     public String getDate() {

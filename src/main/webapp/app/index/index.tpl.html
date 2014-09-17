@@ -5,11 +5,11 @@
                 <tr>
                     <th>Id</th>
                     <th>Url запроса</th>
-                    <th>Ваша ставка</th>
+                    <!--<th>Ваша ставка</th>-->
                     <th>Дата начала аукциона</th>
                     <th>Время выполнения</th>
-                    <th>Площадка</th>
-                    <th>Тип запроса</th>
+                    <!--<th>Площадка</th>-->
+                    <!--<th>Тип запроса</th>-->
                     <th>Статус</th>
                     <th>Del</th>
                 </tr>
@@ -20,11 +20,11 @@
             <tr ng-repeat="t in tasks">
                 <td>{{t.id}}</td>
                 <td>{{t.url}}</td>
-                <td>{{t.bid}}</td>
-                <td>{{t.beginDate}}</td>
-                <td>{{t.endTime - t.startTime}}</td>
-                <td>{{t.auctionType.name}}</td>
-                <td>{{t.requestType.name}}</td>
+                <!--<td>{{t.bid}}</td>-->
+                <td>{{t.beginDate | date:'dd.MM.yyyy HH:mm:ss'}}</td>
+                <td>{{(t.endTime - t.startTime) / 1000}} секунд</td>
+                <!--<td>{{t.auctionType.name}}</td>-->
+                <!--<td>{{t.requestType.name}}</td>-->
                 <td>{{t.status.name}}</td>
                 <td><a href="" ng-click="delete(t)"><span class="glyphicon glyphicon-remove"></span></a></td>
                 
@@ -32,8 +32,9 @@
         </table>
     </div>
     <div class="row">
-        <div class="col-lg-2 col-lg-offset-5">
-            <a href="#/task" class="btn btn-primary active" role="button">Add new task</a>
+        <div class="col-lg-4 col-lg-offset-4 text-center">
+            <a href="#/task" class="btn btn-primary active" role="button">Добавить задачу</a>
+            <a href="" class="btn btn-primary active" role="button" ng-click="findAll()">Обновить</a>
         </div>
     </div>
 </div>

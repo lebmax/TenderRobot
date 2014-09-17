@@ -1,17 +1,18 @@
 package com.vinichenkosa.tenderrobot.model.utender;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Response {
-    
-    private String d;
+    @XmlElement(name = "d")
+    private UtenderDateTime d;
 
-    public String getD() {
+    public UtenderDateTime getD() {
         return d;
     }
 
-    public void setD(String d) {
+    public void setD(UtenderDateTime d) {
         this.d = d;
     }
     

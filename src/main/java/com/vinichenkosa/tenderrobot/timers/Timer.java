@@ -7,13 +7,10 @@ import com.vinichenkosa.tenderrobot.service.TaskFacadeREST;
 import com.vinichenkosa.tenderrobot.service.TaskStatusFacadeREST;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.inject.Inject;
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -35,21 +32,15 @@ public class Timer {
         logger.info("timer started");
         List<Task> tasksToExecute = taskFacade.findByStatusCode(1);
         logger.info("{} active tasks founded.", tasksToExecute.size());
-        DateTime now = new DateTime();
+        
+        DateTime now = UtenderTask.getTime();
         UtenderAuth uAuth = null;
         for (Task task : tasksToExecute) {
             DateTime beginDate = new DateTime(task.getBeginDate());
-            Period dayDiff = new Period(now, beginDate, PeriodType.days());
-            logger.info("Period: {}", dayDiff.getDays());
-
-            if (dayDiff.getDays() > 0) {
-                break;
-            }
-
-            LocalTime time = UtenderTask.getTime();
-            Period minDiff = new Period(time.toDateTimeToday(), beginDate, PeriodType.seconds());
-            logger.info("Diff in seconds: {}", minDiff.getSeconds());
-            if (minDiff.getSeconds() > 0) {
+            
+            Period diffInSecons = new Period(now, beginDate, PeriodType.seconds());
+            logger.info("Diff in seconds: {}", diffInSecons.getSeconds());
+            if (diffInSecons.getSeconds() > 0) {
                 break;
             }
             task.setStatus(taskStatusFacade.findByCode(2));
@@ -65,6 +56,7 @@ public class Timer {
                 task.setStatus(taskStatusFacade.findByCode(3));
             } catch (Exception ex) {
                 task.setStatus(taskStatusFacade.findByCode(4));
+                logger.error("", ex);
             } finally {
                 task.setEndTime(new Date());
                 taskFacade.edit(task.getId(), task);

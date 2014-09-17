@@ -5,6 +5,9 @@
  */
 package com.vinichenkosa.tenderrobot.model.utender;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +17,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.jsoup.nodes.Document;
 
 /**
  *
@@ -44,5 +48,9 @@ public class UtenderHttpCommon {
         }
 
         return new UrlEncodedFormEntity(formparams, Consts.UTF_8);
+    }
+    
+    public static void saveResponse(Document doc, String path) throws IOException{
+        Files.write(Paths.get(path), doc.toString().getBytes());
     }
 }
