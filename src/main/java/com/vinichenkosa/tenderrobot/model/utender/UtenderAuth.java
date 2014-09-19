@@ -7,6 +7,7 @@ package com.vinichenkosa.tenderrobot.model.utender;
 
 import com.vinichenkosa.tenderrobot.model.Task;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.http.HttpEntity;
@@ -29,26 +30,22 @@ import org.jsoup.select.Elements;
  * @author vinichenkosa
  */
 public class UtenderAuth {
-    
-    
-    private final BasicCookieStore cookieStore;
-    private final CloseableHttpClient httpclient;
+
+    private static final BasicCookieStore cookieStore = new BasicCookieStore();
     //private Map<String, String> cookies = new HashMap<>();
 
-    public UtenderAuth() throws Exception {
-        
-        cookieStore = new BasicCookieStore();
-        httpclient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
+    public static BasicCookieStore getCookies(Date date) throws Exception {
 
-        try {
-            Map<String, String> params = loadMain();
-            auth(params);
-        } finally {
-            httpclient.close();
+        if (cookieStore.getCookies().isEmpty() || cookieStore.clearExpired(date)) {
+            try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();) {
+                Map<String, String> params = loadMain(httpclient);
+                auth(params, httpclient);
+            }
         }
+        return cookieStore;
     }
-    
-    private Map<String, String> loadMain() throws Exception {
+
+    private static Map<String, String> loadMain(CloseableHttpClient httpclient) throws Exception {
 
         String url = "http://utender.ru/";
 
@@ -63,27 +60,27 @@ public class UtenderAuth {
             try (InputStream content = response.getEntity().getContent()) {
                 //Path respFile = saveResponse(IOUtils.toByteArray(content));
                 //try (InputStream is = Files.newInputStream(respFile);) {
-                    Document doc = Jsoup.parse(content, "utf-8", url);
-                    Elements inputs = doc.select("input");
-                    for (Element input : inputs) {
-                        switch (input.attr("value")) {
-                            case "Очистить":
-                                break;
-                            case "Искать":
-                                break;
-                            default:
-                                params.put(input.attr("name"), input.attr("value"));
-                                //logger.debug("{}={}", input.attr("name"), input.attr("value"));
-                                break;
-                        }
+                Document doc = Jsoup.parse(content, "utf-8", url);
+                Elements inputs = doc.select("input");
+                for (Element input : inputs) {
+                    switch (input.attr("value")) {
+                        case "Очистить":
+                            break;
+                        case "Искать":
+                            break;
+                        default:
+                            params.put(input.attr("name"), input.attr("value"));
+                            //logger.debug("{}={}", input.attr("name"), input.attr("value"));
+                            break;
                     }
+                }
 
-                    Elements selects = doc.select("select");
-                    //logger.debug("Found {} selects.", selects.size());
-                    for (Element select : selects) {
-                        params.put(select.attr("name"), "");
-                        //logger.debug("{}={}", select.attr("name"), "");
-                    }
+                Elements selects = doc.select("select");
+                //logger.debug("Found {} selects.", selects.size());
+                for (Element select : selects) {
+                    params.put(select.attr("name"), "");
+                    //logger.debug("{}={}", select.attr("name"), "");
+                }
                 //}
             }
             EntityUtils.consume(entity);
@@ -92,7 +89,7 @@ public class UtenderAuth {
         }
     }
 
-    private void auth(Map<String, String> params) throws Exception {
+    private static void auth(Map<String, String> params, CloseableHttpClient httpclient) throws Exception {
 
         String url = "http://utender.ru/";
         params.put("ctl00$ctl00$LeftContentLogin$ctl00$Login1$UserName", "chudilos");
@@ -119,14 +116,4 @@ public class UtenderAuth {
         }
 
     }
-
-    public BasicCookieStore getCookieStore() {
-        return cookieStore;
-    }
-
-    public CloseableHttpClient getHttpclient() {
-        return httpclient;
-    }
-    
-    
 }

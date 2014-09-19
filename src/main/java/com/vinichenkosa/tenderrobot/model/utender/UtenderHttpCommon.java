@@ -9,15 +9,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.joda.time.DateTime;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -53,4 +61,19 @@ public class UtenderHttpCommon {
     public static void saveResponse(Document doc, String path) throws IOException{
         Files.write(Paths.get(path), doc.toString().getBytes());
     }
+    
+        public static DateTime getTime() throws IOException {
+        Client client = ClientBuilder.newClient();
+        javax.ws.rs.core.Response response = client.target("http://utender.ru/public/services/datetime/GetDateTime")
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                //.header("Content-Type", "application/json")
+                .post(Entity.json(""));
+
+        Date date = response.getDate();
+        logger.debug("Server date json: {}", response.readEntity(String.class));
+        return new DateTime(date);
+    }
+        
+        private static final Logger logger = LoggerFactory.getLogger(UtenderHttpCommon.class.getName());
 }

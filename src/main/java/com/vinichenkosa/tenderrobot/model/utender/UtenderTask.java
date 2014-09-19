@@ -5,10 +5,9 @@ import com.impulsm.signatureutils.exceptions.KeystoreInitializationException;
 import com.impulsm.signatureutils.keystore.Keystore;
 import com.impulsm.signatureutils.keystore.KeystoreTypes;
 import com.impulsm.signatureutils.signature.GOSTSignature;
+import com.vinichenkosa.tenderrobot.model.Task;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
@@ -16,10 +15,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -27,11 +24,10 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.joda.time.DateTime;
-import org.joda.time.LocalTime;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,39 +35,35 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UtenderTask {
+public class UtenderTask implements Callable<Task> {
 
-    private UtenderAuth auth;
+    private final HttpClientContext context = HttpClientContext.create();
+    private BasicCookieStore cookies;
+    private final Task task;
+    private CloseableHttpClient httpclient;
+    private HttpPost requestToSend;
+    private boolean prepared = false;
 
-    public UtenderTask(UtenderAuth auth) {
-        this.auth = auth;
+    public UtenderTask(Task task) throws Exception {
+        this.task = task;
     }
 
-    public void execute(String requestUrl) throws Exception {
-        try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCookieStore(auth.getCookieStore()).build();) {
-            logger.info("Sending request");
-            Map<String, String> params = loadRequest(requestUrl, httpclient);
-            sendRequest(params, requestUrl, httpclient);
-        }
+    public void prepare(BasicCookieStore cookies) throws Exception {
+
+        logger.debug("Prepare task {}", task.getId());
+        this.cookies = cookies;
+
+        context.setCookieStore(this.cookies);
+        this.httpclient = HttpClients.custom().setDefaultCookieStore(this.cookies).build();
+        Map<String, String> params = loadRequest();
+        prepareRequestToSend(params);
+        prepared = true;
+
     }
 
-    public static DateTime getTime() throws IOException {
-        Client client = ClientBuilder.newClient();
-        javax.ws.rs.core.Response response = client.target("http://utender.ru/public/services/datetime/GetDateTime")
-                .request(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                //.header("Content-Type", "application/json")
-                .post(Entity.json(""));
+    private Map<String, String> loadRequest() throws IOException {
 
-        Date date = response.getDate();
-        return new DateTime(date);
-    }
-
-    private Map<String, String> loadRequest(String requestUrl, CloseableHttpClient httpclient) throws IOException {
-
-        HttpClientContext context = HttpClientContext.create();
-        context.setCookieStore(auth.getCookieStore());
-        HttpGet httpget = new HttpGet(requestUrl);
+        HttpGet httpget = new HttpGet(task.getUrl());
         UtenderHttpCommon.addGetHeaders(httpget);
 
         try (CloseableHttpResponse response = httpclient.execute(httpget, context)) {
@@ -81,7 +73,7 @@ public class UtenderTask {
             try (InputStream content = response.getEntity().getContent()) {
                 //Path respFile = saveResponse(IOUtils.toByteArray(content));
                 //try (InputStream is = Files.newInputStream(respFile);) {
-                Document doc = Jsoup.parse(content, "utf-8", requestUrl);
+                Document doc = Jsoup.parse(content, "utf-8", task.getUrl());
                 UtenderHttpCommon.saveResponse(doc, "loadRequestResponse.html");
                 Elements inputs = doc.select("input");
                 for (Element input : inputs) {
@@ -106,7 +98,7 @@ public class UtenderTask {
         }
     }
 
-    private void sendRequest(Map<String, String> params, String requestUrl, CloseableHttpClient httpclient) throws KeystoreInitializationException, KeyStoreException, Exception {
+    private void prepareRequestToSend(Map<String, String> params) throws KeystoreInitializationException, KeyStoreException, Exception {
 
         Keystore keystore = new Keystore();
         keystore.load(KeystoreTypes.RutokenStore);
@@ -129,25 +121,49 @@ public class UtenderTask {
         params.remove("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidSignedData");
         params.remove("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign");
 
-        HttpPost request = new HttpPost(requestUrl);
-        UtenderHttpCommon.addPostHeaders(request);
+        requestToSend = new HttpPost(task.getUrl());
+        UtenderHttpCommon.addPostHeaders(requestToSend);
         UrlEncodedFormEntity form = UtenderHttpCommon.addFormParams(params);
-        request.setEntity(form);
-
-        HttpClientContext context = HttpClientContext.create();
-        context.setCookieStore(auth.getCookieStore());
-
-        try (CloseableHttpResponse response = httpclient.execute(request, context)) {
-
-            HttpEntity entity = response.getEntity();
-            Document doc = Jsoup.parse(entity.getContent(), "utf-8", requestUrl);
-            UtenderHttpCommon.saveResponse(doc, "sendRequestResponse.html");
-            EntityUtils.consume(entity);
-            //printCookies();
-
-        }
+        requestToSend.setEntity(form);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(UtenderTask.class.getName());
+
+    @Override
+    public Task call() throws Exception {
+
+        try {
+            logger.debug("task called");
+            while (!prepared) {
+                logger.debug("Steel preparing");
+            }
+            task.setStartTime(new Date());
+            try (CloseableHttpResponse response = httpclient.execute(requestToSend, context);) {
+                task.setEndTime(new Date());
+                logger.debug("Task finished");
+            }
+            //HttpEntity entity = response.getEntity();
+            //Document doc = Jsoup.parse(entity.getContent(), "utf-8", requestUrl);
+            //UtenderHttpCommon.saveResponse(doc, "sendRequestResponse.html");
+            //EntityUtils.consume(entity);
+
+        } finally {
+            try {
+                httpclient.close();
+            } catch (IOException ex) {
+                logger.error("Can't close httpClient.", ex);
+            }
+        }
+        return task;
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
+    @Override
+    public String toString() {
+        return "UtenderTask{" + "context=" + context + ", cookies=" + cookies + ", task=" + task + ", httpclient=" + httpclient + ", requestToSend=" + requestToSend + '}';
+    }
 
 }

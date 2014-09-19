@@ -14,6 +14,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
@@ -55,6 +56,9 @@ public class Task implements Serializable {
 
     @OneToOne(targetEntity = TaskStatus.class)
     private TaskStatus status;
+    
+    @Transient
+    private Boolean success;
 
     public Task() {
 
@@ -131,5 +135,14 @@ public class Task implements Serializable {
     public void setStatus(TaskStatus status) {
         this.status = status;
     }
+
+    public Boolean getSuccess() {
+        return success;
+    }
+
+    public void setSuccess(Boolean success) {
+        this.success = success;
+    }
+    
 
 }
