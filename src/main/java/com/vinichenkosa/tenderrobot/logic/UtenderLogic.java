@@ -21,9 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import javax.ejb.AsyncResult;
 import javax.ejb.Asynchronous;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Stateless;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
@@ -101,18 +102,19 @@ public class UtenderLogic {
         }
     }
 
+    @Lock(LockType.WRITE)
     private HttpPost prepareRequestToSend(Map<String, String> params, Task task) throws KeystoreInitializationException, KeyStoreException, Exception {
 
         Keystore keystore = new Keystore();
-        //keystore.load(KeystoreTypes.RutokenStore);
-        keystore.load(KeystoreTypes.HDImageStore);
+        keystore.load(KeystoreTypes.RutokenStore);
+//        keystore.load(KeystoreTypes.HDImageStore);
         List<String> aliases = keystore.getAliases();
         logger.debug("Available aliases:");
         for (String alias : aliases) {
             logger.debug("{}", alias);
         }
-        //PrivateKey pk = keystore.loadKey(aliases.get(0), "12345678");
-        PrivateKey pk = keystore.loadKey("tender", "abc123");
+        PrivateKey pk = keystore.loadKey(aliases.get(0), "12345678");
+//        PrivateKey pk = keystore.loadKey("tender", "abc123");
         Certificate cert = keystore.loadCertificate(aliases.get(0));
 
         PKCS7Container pkcs7 = new PKCS7Container(new GOSTSignature());

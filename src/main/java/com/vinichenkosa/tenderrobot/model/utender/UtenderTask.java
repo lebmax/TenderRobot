@@ -44,16 +44,16 @@ public class UtenderTask implements Callable<Task> {
 
         try {
             logger.debug("task called");
+            task.setStartTime(new Date());
             while (!cookiesFutureCont.isDone()) {
             }
             BasicCookieStore cookies = cookiesFutureCont.get();
-            logger.debug("Authorization done.");
-            while (!requestFutureCont.isDone()) {
-            }
-            
             context.setCookieStore(cookies);
             this.httpclient = HttpClients.custom().setDefaultCookieStore(cookies).build();
+            logger.debug("Authorization done.");
             
+            while (!requestFutureCont.isDone()) {
+            }
             HttpPost request = requestFutureCont.get();
             if (request == null) {
                 logger.debug("Request not formed. Trying again...");
@@ -67,11 +67,10 @@ public class UtenderTask implements Callable<Task> {
             if (request == null) {
                 throw new Exception("Не удалось сформировать запрос по адресу " + task.getUrl());
             }
+            logger.debug("Request is prepared.");
 
-            task.setStartTime(new Date());
             try (CloseableHttpResponse response = httpclient.execute(request, context);) {
                 task.setEndTime(new Date());
-
                 logger.debug("Task finished");
                 HttpEntity entity = response.getEntity();
                 Document doc = Jsoup.parse(entity.getContent(), "utf-8", task.getUrl());
