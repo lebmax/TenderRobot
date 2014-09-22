@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -56,8 +55,15 @@ public class UtenderTask implements Callable<Task> {
         context.setCookieStore(this.cookies);
         this.httpclient = HttpClients.custom().setDefaultCookieStore(this.cookies).build();
         Map<String, String> params = loadRequest();
-        prepareRequestToSend(params);
-        prepared = true;
+        prepared = prepareRequestToSend(params);
+    }
+
+    public boolean prepare() throws Exception {
+
+        logger.debug("Prepare task {}", task.getId());
+
+        Map<String, String> params = loadRequest();
+        return prepareRequestToSend(params);
 
     }
 
@@ -98,7 +104,7 @@ public class UtenderTask implements Callable<Task> {
         }
     }
 
-    private void prepareRequestToSend(Map<String, String> params) throws KeystoreInitializationException, KeyStoreException, Exception {
+    private boolean prepareRequestToSend(Map<String, String> params) throws KeystoreInitializationException, KeyStoreException, Exception {
 
         Keystore keystore = new Keystore();
         keystore.load(KeystoreTypes.RutokenStore);
@@ -112,6 +118,9 @@ public class UtenderTask implements Callable<Task> {
 
         PKCS7Container pkcs7 = new PKCS7Container(new GOSTSignature());
         String dataToSign = params.get("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign");
+        if (dataToSign == null) {
+            return false;
+        }
         logger.debug("Data to sign {}", dataToSign);
         byte[] signedData = pkcs7.generatePKCS7Signature(pk, cert, dataToSign.getBytes(), false);
 
@@ -125,6 +134,7 @@ public class UtenderTask implements Callable<Task> {
         UtenderHttpCommon.addPostHeaders(requestToSend);
         UrlEncodedFormEntity form = UtenderHttpCommon.addFormParams(params);
         requestToSend.setEntity(form);
+        return true;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(UtenderTask.class.getName());
@@ -134,9 +144,13 @@ public class UtenderTask implements Callable<Task> {
 
         try {
             logger.debug("task called");
-            while (!prepared) {
-                logger.debug("Steel preparing");
+            if (!prepared) {
+                if (!prepare()) {
+                    logger.debug("Задача не подготовлена");
+                    throw new Exception("Задача не подготовлена");
+                }
             }
+            
             task.setStartTime(new Date());
             try (CloseableHttpResponse response = httpclient.execute(requestToSend, context);) {
                 task.setEndTime(new Date());

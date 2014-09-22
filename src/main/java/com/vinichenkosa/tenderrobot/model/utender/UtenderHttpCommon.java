@@ -71,7 +71,6 @@ public class UtenderHttpCommon {
                 .post(Entity.json(""));
 
         Date date = response.getDate();
-        logger.debug("Server date json: {}", response.readEntity(String.class));
         return new DateTime(date);
     }
         

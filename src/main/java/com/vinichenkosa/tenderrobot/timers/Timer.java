@@ -34,32 +34,41 @@ public class Timer {
     @Resource(name = "concurrent/__defaultManagedScheduledExecutorService")
     private ManagedScheduledExecutorService executor;
 
-    @Schedule(hour = "*", minute = "*", second = "0", persistent = false)
+    @Schedule(hour = "*", minute = "*", second = "*", persistent = false)
     @Asynchronous
     public void myTimer() {
         try {
 
             List<Task> tasksToExecute = taskFacade.findByStatusCode(1);
-            logger.debug("{} active tasks founded.", tasksToExecute.size());
-
+            
             for (Task task : tasksToExecute) {
                 try {
 
                     long diff = task.getBeginDate().getTime() - UtenderHttpCommon.getTime().getMillis();
-                    logger.debug("Mill to execute: {}", diff);
+                    
 
                     if (diff > 300000) {
+                        logger.debug("No tasks to execute");
                         break;
                     }
+                    
+                    logger.debug("Mill to execute: {}", diff);
 
                     logger.debug("Add task {} to active", task);
                     UtenderTask utask = new UtenderTask(task);
                     ScheduledFuture<Task> f = executor.schedule(utask, diff, TimeUnit.MILLISECONDS);
-                    tasksToPrepare.add(utask);
+                    logger.debug("Task {} scheduled", task);
                     futures.put(task, f);
+                    logger.debug("Task {} added to future", task);
+                    tasksToPrepare.add(utask);
+                    logger.debug("Task {} added to prepared", task);
+                    
+                    
 
                     task.setStatus(taskStatusFacade.findByCode(2));
                     taskFacade.edit(task.getId(), task);
+                    logger.debug("Tasks status chandef to 2");
+                    
 
                 } catch (Exception ex) {
                     logger.error("Ощибка добавления задачи {} в очередь. ", task.getId(), ex);
@@ -77,13 +86,20 @@ public class Timer {
     @Schedule(hour = "*", minute = "*", second = "*", persistent = false)
     @Asynchronous
     private void prepareTasks() {
-        logger.debug("Preparing tasks ...");
+        
         for (UtenderTask task = tasksToPrepare.poll(); task != null; task = null) {
             try {
                 task.prepare(UtenderAuth.getCookies(task.getTask().getBeginDate()));
                 logger.debug("Task prepared");
             } catch (Exception ex) {
                 logger.error("Ошибка подготовки задач", ex);
+                ScheduledFuture<Task> t = futures.get(task.getTask());
+                if(t != null){
+                    t.cancel(true);
+                }else{
+                    logger.debug("Не смог отменить задачу {}", task);
+                }
+                
             }
         }
     }
@@ -93,8 +109,6 @@ public class Timer {
     private void checkTasks() {
         try {
 
-            logger.debug("Checking task execution ...");
-            logger.debug("{} task to check", futures.size());
             Enumeration<Task> keys = futures.keys();
             
 
