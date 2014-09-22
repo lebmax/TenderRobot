@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import javax.annotation.Resource;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
@@ -64,7 +63,6 @@ public class Timer {
                     UtenderTask utask = new UtenderTask(task);
 
                     if (diff < 0) {
-                        diff = 1000;
                         cookiesFutureCont = authService.getCookies(new Date());
                     } else {
                         cookiesFutureCont = authService.getCookies(task.getBeginDate());
@@ -76,8 +74,6 @@ public class Timer {
                     logger.debug("Task {} scheduled", task);
                     futures.put(task, f);
                     logger.debug("Task {} added to future", task);
-//                    tasksToPrepare.add(utask);
-//                    logger.debug("Task {} added to prepared", task);
 
                     task.setStatus(taskStatusFacade.findByCode(2));
                     taskFacade.edit(task.getId(), task);
@@ -121,7 +117,7 @@ public class Timer {
                         logger.debug("Task successfully done.");
                     } catch (ExecutionException ex) {
                         key.setStatus(taskStatusFacade.findByCode(4));
-                        logger.error("123", ex);
+                        logger.error("Ошибка выполнения задачи:", ex);
                     }
                 }
                 taskFacade.edit(key.getId(), key);

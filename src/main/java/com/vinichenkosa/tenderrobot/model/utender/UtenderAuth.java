@@ -41,7 +41,7 @@ public class UtenderAuth {
     //private Map<String, String> cookies = new HashMap<>();
 
     @Asynchronous
-    @Lock(LockType.READ)
+    @Lock(LockType.WRITE)
     public Future<BasicCookieStore> getCookies(Date date) throws Exception {
 
         if (cookieStore.getCookies().isEmpty() || cookieStore.clearExpired(date)) {
