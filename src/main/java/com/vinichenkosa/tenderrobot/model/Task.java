@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import java.util.Date;
 import javax.persistence.Basic;
+import javax.persistence.Cache;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,6 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries(value = {
     @NamedQuery(name = "Task.findByStatusCode", query = "select t from Task t where t.status.code = :code order by t.beginDate asc")
 })
+@Cacheable(false)
 public class Task implements Serializable {
 
     @Temporal(TemporalType.TIMESTAMP)

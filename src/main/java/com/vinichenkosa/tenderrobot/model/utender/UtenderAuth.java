@@ -10,6 +10,12 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
+import javax.ejb.AsyncResult;
+import javax.ejb.Asynchronous;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
+import javax.ejb.Singleton;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -24,28 +30,35 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- *
- * @author vinichenkosa
- */
+@Singleton
 public class UtenderAuth {
 
-    private static final BasicCookieStore cookieStore = new BasicCookieStore();
+    private final BasicCookieStore cookieStore = new BasicCookieStore();
+    private final Logger logger = LoggerFactory.getLogger(UtenderAuth.class.getName());
     //private Map<String, String> cookies = new HashMap<>();
 
-    public static BasicCookieStore getCookies(Date date) throws Exception {
+    @Asynchronous
+    @Lock(LockType.READ)
+    public Future<BasicCookieStore> getCookies(Date date) throws Exception {
 
         if (cookieStore.getCookies().isEmpty() || cookieStore.clearExpired(date)) {
+            logger.debug("Getting cookies");
             try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();) {
+                logger.debug("Loading main page for authorization");
                 Map<String, String> params = loadMain(httpclient);
+                logger.debug("Authorization...");
                 auth(params, httpclient);
             }
+        } else {
+            logger.debug("Куки уже установлены.");
         }
-        return cookieStore;
+        return new AsyncResult<>(cookieStore);
     }
 
-    private static Map<String, String> loadMain(CloseableHttpClient httpclient) throws Exception {
+    private Map<String, String> loadMain(CloseableHttpClient httpclient) throws Exception {
 
         String url = "http://utender.ru/";
 
@@ -89,7 +102,7 @@ public class UtenderAuth {
         }
     }
 
-    private static void auth(Map<String, String> params, CloseableHttpClient httpclient) throws Exception {
+    private void auth(Map<String, String> params, CloseableHttpClient httpclient) throws Exception {
 
         String url = "http://utender.ru/";
         params.put("ctl00$ctl00$LeftContentLogin$ctl00$Login1$UserName", "chudilos");
@@ -110,8 +123,9 @@ public class UtenderAuth {
         try (CloseableHttpResponse response = httpclient.execute(request, context)) {
 
             HttpEntity entity = response.getEntity();
+            Document doc = Jsoup.parse(entity.getContent(), "utf-8", url);
+            UtenderHttpCommon.saveResponse(doc, "sendAuthResponse.html");
             EntityUtils.consume(entity);
-            //printCookies();
 
         }
 

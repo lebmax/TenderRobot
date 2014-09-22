@@ -1,26 +1,17 @@
 package com.vinichenkosa.tenderrobot.model.utender;
 
-import com.impulsm.signatureutils.container.PKCS7Container;
-import com.impulsm.signatureutils.exceptions.KeystoreInitializationException;
-import com.impulsm.signatureutils.keystore.Keystore;
-import com.impulsm.signatureutils.keystore.KeystoreTypes;
-import com.impulsm.signatureutils.signature.GOSTSignature;
+import com.vinichenkosa.tenderrobot.logic.UtenderLogic;
 import com.vinichenkosa.tenderrobot.model.Task;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.KeyStoreException;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
-import org.apache.commons.codec.binary.Base64;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -36,105 +27,14 @@ import org.slf4j.LoggerFactory;
 
 public class UtenderTask implements Callable<Task> {
 
-    private final HttpClientContext context = HttpClientContext.create();
-    private BasicCookieStore cookies;
     private final Task task;
+    private final HttpClientContext context = HttpClientContext.create();
     private CloseableHttpClient httpclient;
-    private HttpPost requestToSend;
-    private boolean prepared = false;
+    private Future<BasicCookieStore> cookiesFutureCont;
+    private Future<HttpPost> requestFutureCont;
 
     public UtenderTask(Task task) throws Exception {
         this.task = task;
-    }
-
-    public void prepare(BasicCookieStore cookies) throws Exception {
-
-        logger.debug("Prepare task {}", task.getId());
-        this.cookies = cookies;
-
-        context.setCookieStore(this.cookies);
-        this.httpclient = HttpClients.custom().setDefaultCookieStore(this.cookies).build();
-        Map<String, String> params = loadRequest();
-        prepared = prepareRequestToSend(params);
-    }
-
-    public boolean prepare() throws Exception {
-
-        logger.debug("Prepare task {}", task.getId());
-
-        Map<String, String> params = loadRequest();
-        return prepareRequestToSend(params);
-
-    }
-
-    private Map<String, String> loadRequest() throws IOException {
-
-        HttpGet httpget = new HttpGet(task.getUrl());
-        UtenderHttpCommon.addGetHeaders(httpget);
-
-        try (CloseableHttpResponse response = httpclient.execute(httpget, context)) {
-
-            HttpEntity entity = response.getEntity();
-            Map<String, String> params = new HashMap<>();
-            try (InputStream content = response.getEntity().getContent()) {
-                //Path respFile = saveResponse(IOUtils.toByteArray(content));
-                //try (InputStream is = Files.newInputStream(respFile);) {
-                Document doc = Jsoup.parse(content, "utf-8", task.getUrl());
-                UtenderHttpCommon.saveResponse(doc, "loadRequestResponse.html");
-                Elements inputs = doc.select("input");
-                for (Element input : inputs) {
-                    if (!input.attr("name").contains("btn")
-                            && !input.attr("name").contains("Button")) {
-                        params.put(input.attr("name"), input.attr("value"));
-                        logger.debug("{}={}", input.attr("name"), input.attr("value"));
-                    }
-                }
-
-                Elements selects = doc.select("select");
-                logger.debug("Found {} selects.", selects.size());
-                for (Element select : selects) {
-                    params.put(select.attr("name"), "");
-                    logger.debug("{}={}", select.attr("name"), "");
-                }
-                //}
-            }
-            EntityUtils.consume(entity);
-            //printCookies();
-            return params;
-        }
-    }
-
-    private boolean prepareRequestToSend(Map<String, String> params) throws KeystoreInitializationException, KeyStoreException, Exception {
-
-        Keystore keystore = new Keystore();
-        keystore.load(KeystoreTypes.RutokenStore);
-        List<String> aliases = keystore.getAliases();
-        logger.debug("Available aliases:");
-        for (String alias : aliases) {
-            logger.debug("{}", alias);
-        }
-        PrivateKey pk = keystore.loadKey(aliases.get(0), "12345678");
-        Certificate cert = keystore.loadCertificate(aliases.get(0));
-
-        PKCS7Container pkcs7 = new PKCS7Container(new GOSTSignature());
-        String dataToSign = params.get("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign");
-        if (dataToSign == null) {
-            return false;
-        }
-        logger.debug("Data to sign {}", dataToSign);
-        byte[] signedData = pkcs7.generatePKCS7Signature(pk, cert, dataToSign.getBytes(), false);
-
-        params.put("__EVENTTARGET", "ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest");
-        params.put("__EVENTARGUMENT", "sd_" + Base64.encodeBase64String(signedData));
-        params.put("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$hfProposalDone", "1");
-        params.remove("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidSignedData");
-        params.remove("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign");
-
-        requestToSend = new HttpPost(task.getUrl());
-        UtenderHttpCommon.addPostHeaders(requestToSend);
-        UrlEncodedFormEntity form = UtenderHttpCommon.addFormParams(params);
-        requestToSend.setEntity(form);
-        return true;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(UtenderTask.class.getName());
@@ -144,22 +44,53 @@ public class UtenderTask implements Callable<Task> {
 
         try {
             logger.debug("task called");
-            if (!prepared) {
-                if (!prepare()) {
-                    logger.debug("Задача не подготовлена");
-                    throw new Exception("Задача не подготовлена");
-                }
+            while (!cookiesFutureCont.isDone()) {
+            }
+            BasicCookieStore cookies = cookiesFutureCont.get();
+            logger.debug("Authorization done.");
+            while (!requestFutureCont.isDone()) {
             }
             
-            task.setStartTime(new Date());
-            try (CloseableHttpResponse response = httpclient.execute(requestToSend, context);) {
-                task.setEndTime(new Date());
-                logger.debug("Task finished");
+            context.setCookieStore(cookies);
+            this.httpclient = HttpClients.custom().setDefaultCookieStore(cookies).build();
+            
+            HttpPost request = requestFutureCont.get();
+            if (request == null) {
+                logger.debug("Request not formed. Trying again...");
+                UtenderLogic requestFactory = lookupUtenderLogicBean();
+                requestFutureCont = requestFactory.prepare(cookiesFutureCont, task);
+                while (!requestFutureCont.isDone()) {
+                }
+                request = requestFutureCont.get();
             }
-            //HttpEntity entity = response.getEntity();
-            //Document doc = Jsoup.parse(entity.getContent(), "utf-8", requestUrl);
-            //UtenderHttpCommon.saveResponse(doc, "sendRequestResponse.html");
-            //EntityUtils.consume(entity);
+
+            if (request == null) {
+                throw new Exception("Не удалось сформировать запрос по адресу " + task.getUrl());
+            }
+
+            task.setStartTime(new Date());
+            try (CloseableHttpResponse response = httpclient.execute(request, context);) {
+                task.setEndTime(new Date());
+
+                logger.debug("Task finished");
+                HttpEntity entity = response.getEntity();
+                Document doc = Jsoup.parse(entity.getContent(), "utf-8", task.getUrl());
+                Elements errorsCont = doc.getElementsByAttributeValue("id", "ctl00_ctl00_MainContent_ContentPlaceHolderMiddle_ctl00_BidsValidationSummary");
+                
+                if(!errorsCont.isEmpty()){
+                    StringBuilder sb = new StringBuilder("Запрос не прошел валидацию на сервере.\n");
+                    Elements errorList = errorsCont.get(0).getElementsByTag("li");
+                    sb.append("Ответ от сервера содержит ").append(errorList.size()).append(" ошибок.\n");
+                    for (Element error : errorList) {
+                        sb.append("Ошибка 1: ").append(error.text()).append("\n");
+                    }
+                    
+                    throw new Exception(sb.toString());
+                }
+                UtenderHttpCommon.saveResponse(doc, "sendRequestResponse.html");
+                EntityUtils.consume(entity);
+                return task;
+            }
 
         } finally {
             try {
@@ -168,16 +99,37 @@ public class UtenderTask implements Callable<Task> {
                 logger.error("Can't close httpClient.", ex);
             }
         }
-        return task;
+        
     }
 
     public Task getTask() {
         return task;
     }
 
-    @Override
-    public String toString() {
-        return "UtenderTask{" + "context=" + context + ", cookies=" + cookies + ", task=" + task + ", httpclient=" + httpclient + ", requestToSend=" + requestToSend + '}';
+    public Future<BasicCookieStore> getCookiesFutureCont() {
+        return cookiesFutureCont;
+    }
+
+    public void setCookiesFutureCont(Future<BasicCookieStore> cookiesFutureCont) {
+        this.cookiesFutureCont = cookiesFutureCont;
+    }
+
+    public Future<HttpPost> getRequestFutureCont() {
+        return requestFutureCont;
+    }
+
+    public void setRequestFutureCont(Future<HttpPost> requestFutureCont) {
+        this.requestFutureCont = requestFutureCont;
+    }
+
+    private UtenderLogic lookupUtenderLogicBean() {
+        try {
+            Context c = new InitialContext();
+            return (UtenderLogic) c.lookup("java:global/TenderRobot/UtenderLogic");
+        } catch (NamingException ne) {
+            java.util.logging.Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
     }
 
 }
