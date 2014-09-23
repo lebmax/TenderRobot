@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.vinichenkosa.tenderrobot.logic;
 
 import com.impulsm.signatureutils.container.PKCS7Container;
@@ -25,7 +20,7 @@ import javax.ejb.AsyncResult;
 import javax.ejb.Asynchronous;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
-import javax.ejb.Stateless;
+import javax.ejb.Singleton;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -44,7 +39,8 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Stateless
+@Singleton
+@Lock(LockType.WRITE)
 public class UtenderLogic {
 
     @Asynchronous
@@ -102,7 +98,6 @@ public class UtenderLogic {
         }
     }
 
-    @Lock(LockType.WRITE)
     private HttpPost prepareRequestToSend(Map<String, String> params, Task task) throws KeystoreInitializationException, KeyStoreException, Exception {
 
         Keystore keystore = new Keystore();

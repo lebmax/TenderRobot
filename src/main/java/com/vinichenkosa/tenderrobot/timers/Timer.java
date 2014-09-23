@@ -96,32 +96,32 @@ public class Timer {
     //@Asynchronous
     private void checkTasks() throws InterruptedException {
 
-        Enumeration<Task> keys = futures.keys();
+        Enumeration<Task> tasks = futures.keys();
 
-        while (keys.hasMoreElements()) {
+        while (tasks.hasMoreElements()) {
 
-            Task key = keys.nextElement();
-            logger.debug("Check task {}", key);
-            ScheduledFuture<Task> task = futures.get(key);
+            Task task = tasks.nextElement();
+            logger.debug("Check task {}", task);
+            ScheduledFuture<Task> job = futures.get(task);
 
-            if (task.isDone()) {
+            if (job.isDone()) {
                 
 
-                if (task.isCancelled()) {
-                    key.setStatus(taskStatusFacade.findByCode(4));
+                if (job.isCancelled()) {
+                    task.setStatus(taskStatusFacade.findByCode(4));
                     logger.error("Task was cancelled ");
                 } else {
                     try {
-                        task.get();
-                        key.setStatus(taskStatusFacade.findByCode(3));
+                        job.get();
+                        task.setStatus(taskStatusFacade.findByCode(3));
                         logger.debug("Task successfully done.");
                     } catch (ExecutionException ex) {
-                        key.setStatus(taskStatusFacade.findByCode(4));
+                        task.setStatus(taskStatusFacade.findByCode(4));
                         logger.error("Ошибка выполнения задачи:", ex);
                     }
                 }
-                taskFacade.edit(key.getId(), key);
-                futures.remove(key);
+                taskFacade.edit(task.getId(), task);
+                futures.remove(task);
             }
         }
     }
