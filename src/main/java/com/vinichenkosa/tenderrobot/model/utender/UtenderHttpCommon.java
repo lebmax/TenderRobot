@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.client.Client;
@@ -57,22 +56,27 @@ public class UtenderHttpCommon {
 
         return new UrlEncodedFormEntity(formparams, Consts.UTF_8);
     }
-    
-    public static void saveResponse(Document doc, String path) throws IOException{
+
+    public static void saveResponse(Document doc, String path) throws IOException {
         Files.write(Paths.get(path), doc.toString().getBytes());
     }
-    
-        public static DateTime getTime() throws IOException {
-        Client client = ClientBuilder.newClient();
-        javax.ws.rs.core.Response response = client.target("http://utender.ru/public/services/datetime/GetDateTime")
-                .request(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                //.header("Content-Type", "application/json")
-                .post(Entity.json(""));
 
-        Date date = response.getDate();
-        return new DateTime(date);
+    public static DateTime getTime() {
+        DateTime dateTime = new DateTime();
+        try {
+            Client client = ClientBuilder.newClient();
+            javax.ws.rs.core.Response response = client.target("http://utender.ru/public/services/datetime/GetDateTime")
+                    .request(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    //.header("Content-Type", "application/json")
+                    .post(Entity.json(""));
+            dateTime = new DateTime(response.getDate());
+            response.close();
+        } catch (Exception ex) {
+            logger.warn("Ошибка получения времени Utender.", ex);
+        }
+        return dateTime;
     }
-        
-        private static final Logger logger = LoggerFactory.getLogger(UtenderHttpCommon.class.getName());
+
+    private static final Logger logger = LoggerFactory.getLogger(UtenderHttpCommon.class.getName());
 }
