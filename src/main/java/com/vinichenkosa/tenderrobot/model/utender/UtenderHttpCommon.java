@@ -26,10 +26,6 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- * @author vinichenkosa
- */
 public class UtenderHttpCommon {
 
     public static void addPostHeaders(HttpPost method) {
