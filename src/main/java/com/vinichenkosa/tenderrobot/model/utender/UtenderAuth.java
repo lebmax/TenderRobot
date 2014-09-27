@@ -44,16 +44,19 @@ public class UtenderAuth {
     @Lock(LockType.WRITE)
     public Future<BasicCookieStore> getCookies(Date date) throws Exception {
 
-        if (cookieStore.getCookies().isEmpty() || cookieStore.clearExpired(date)) {
-            logger.debug("Getting cookies");
-            try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();) {
-                logger.debug("Loading main page for authorization");
-                Map<String, String> params = loadMain(httpclient);
-                logger.debug("Authorization...");
-                auth(params, httpclient);
+        logger.debug("Getting cookies");
+        try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();) {
+
+            logger.debug("Loading main page for authorization");
+            Map<String, String> params = loadMain(httpclient);
+
+            if (params.get("ctl00$ctl00$LeftContentLogin$ctl00$Login1$UserName") == null) {
+                logger.debug("Куки уже установлены.");
             }
-        } else {
-            logger.debug("Куки уже установлены.");
+
+            logger.debug("Authorization...");
+            auth(params, httpclient);
+
         }
         return new AsyncResult<>(cookieStore);
     }
@@ -83,7 +86,7 @@ public class UtenderAuth {
                             break;
                         default:
                             params.put(input.attr("name"), input.attr("value"));
-                            //logger.debug("{}={}", input.attr("name"), input.attr("value"));
+                            logger.debug("{}={}", input.attr("name"), input.attr("value"));
                             break;
                     }
                 }
@@ -128,6 +131,16 @@ public class UtenderAuth {
             EntityUtils.consume(entity);
 
         }
+
+    }
+
+    private boolean isAuthorized(Date date, CloseableHttpClient client) throws Exception {
+        if (cookieStore.getCookies().isEmpty() || cookieStore.clearExpired(date)) {
+            logger.debug("First authorization");
+            return false;
+        }
+        Map<String, String> params = this.loadMain(client);
+        return params.get("ctl00$ctl00$LeftContentLogin$ctl00$Login1$UserName") == null;
 
     }
 }
