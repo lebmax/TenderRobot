@@ -1,6 +1,6 @@
 package com.vinichenkosa.tenderrobot.model.utender;
 
-import com.vinichenkosa.tenderrobot.logic.UtenderLogic;
+import com.vinichenkosa.tenderrobot.logic.utender.UtenderLogic;
 import com.vinichenkosa.tenderrobot.model.Task;
 import java.io.IOException;
 import java.util.Date;

@@ -1,6 +1,6 @@
 package com.vinichenkosa.tenderrobot.timers;
 
-import com.vinichenkosa.tenderrobot.logic.UtenderLogic;
+import com.vinichenkosa.tenderrobot.logic.utender.UtenderLogic;
 import com.vinichenkosa.tenderrobot.model.Task;
 import com.vinichenkosa.tenderrobot.model.utender.UtenderAuth;
 import com.vinichenkosa.tenderrobot.model.utender.UtenderHttpCommon;
