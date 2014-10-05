@@ -2,76 +2,82 @@
 <jpa:entity-mappings persistenceUnitName="TenderRobotPU" id="_14102643571281" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_1.xsd" xmlns:java="http://jcp.org/en/jsr/detail?id=270" xmlns:jpa="http://java.sun.com/xml/ns/persistence/orm" xmlns:ns4="http://nbmodeler.java.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <jpa:package>com.vinichenkosa.tenderrobot.model</jpa:package>
     <jpa:schema>TENDER_ROBOT</jpa:schema>
-    <jpa:entity class="Task" minimized="false" id="_1410264369240">
+    <jpa:entity class="Task" visibile="true" minimized="false" id="_1410264369240">
         <jpa:attributes>
-            <jpa:id name="id" attribute-type="Long" id="_14103353455805">
+            <jpa:id name="id" attribute-type="Long" visibile="true" id="_14103353455805">
                 <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
                 <jpa:generated-value strategy="IDENTITY"/>
             </jpa:id>
-            <jpa:basic name="url" attribute-type="String" id="_14103353583566">
+            <jpa:basic name="url" attribute-type="String" visibile="true" id="_14103353583566">
                 <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
             </jpa:basic>
-            <jpa:basic name="beginDate" attribute-type="java.util.Date" id="_14103353912837">
+            <jpa:basic name="beginDate" attribute-type="java.util.Date" visibile="true" id="_14103353912837">
                 <jpa:column unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
                 <jpa:temporal>TIMESTAMP</jpa:temporal>
             </jpa:basic>
-            <jpa:basic name="startTime" attribute-type="java.util.Date" id="_14103354522358">
+            <jpa:basic name="startTime" attribute-type="java.util.Date" visibile="true" id="_14103354522358">
                 <jpa:column unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
                 <jpa:temporal>TIMESTAMP</jpa:temporal>
             </jpa:basic>
-            <jpa:basic name="endTime" attribute-type="java.util.Date" id="_14103354759479">
+            <jpa:basic name="endTime" attribute-type="java.util.Date" visibile="true" id="_14103354759479">
                 <jpa:column unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
                 <jpa:temporal>TIMESTAMP</jpa:temporal>
             </jpa:basic>
-            <jpa:basic name="bid" attribute-type="String" id="_141033547694710">
+            <jpa:basic name="bid" attribute-type="String" visibile="true" id="_141033547694710">
                 <jpa:column unique="false" nullable="true" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
             </jpa:basic>
-            <jpa:one-to-one name="auctionType" target-entity="AuctionType" optional="true" primaryKey="false" connected-entity-id="_1410356030572" id="_1410359130253100">
+            <jpa:one-to-one name="auctionType" target-entity="AuctionType" optional="true" primaryKey="false" connected-entity-id="_1410356030572" visibile="true" id="_1410359130253100">
                 <jpa:join-table/>
             </jpa:one-to-one>
-            <jpa:one-to-one name="requestType" target-entity="RequestType" optional="true" primaryKey="false" connected-entity-id="_1410356082858" id="_1410359136485101">
+            <jpa:one-to-one name="requestType" target-entity="RequestType" optional="true" primaryKey="false" connected-entity-id="_1410356082858" visibile="true" id="_1410359136485101">
                 <jpa:join-table/>
             </jpa:one-to-one>
-            <jpa:one-to-one name="status" target-entity="TaskStatus" optional="true" primaryKey="false" connected-entity-id="_1410455181380" id="_1410455377327131">
+            <jpa:one-to-one name="status" target-entity="TaskStatus" optional="true" primaryKey="false" connected-entity-id="_1410455181380" visibile="true" id="_1410455377327131">
                 <jpa:join-table/>
             </jpa:one-to-one>
         </jpa:attributes>
     </jpa:entity>
-    <jpa:entity class="AuctionType" minimized="false" id="_1410356030572">
+    <jpa:entity class="AuctionType" visibile="true" minimized="false" id="_1410356030572">
         <jpa:attributes>
-            <jpa:id name="id" attribute-type="Long" id="_141035603821852">
+            <jpa:id name="id" attribute-type="Long" visibile="true" id="_141035603821852">
                 <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
                 <jpa:generated-value strategy="IDENTITY"/>
             </jpa:id>
-            <jpa:basic name="name" attribute-type="String" id="_141035603951453">
+            <jpa:basic name="name" attribute-type="String" visibile="true" id="_141035603951453">
                 <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
             </jpa:basic>
-            <jpa:basic name="url" attribute-type="String" id="_141035604004254">
+            <jpa:basic name="url" attribute-type="String" visibile="true" id="_141035604004254">
+                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+            </jpa:basic>
+            <jpa:basic name="login" attribute-type="String" visibile="true" id="_141251599043111">
+                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255"/>
+            </jpa:basic>
+            <jpa:basic name="password" attribute-type="String" visibile="true" id="_141251599318812">
+                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255"/>
+            </jpa:basic>
+        </jpa:attributes>
+    </jpa:entity>
+    <jpa:entity class="RequestType" visibile="true" minimized="false" id="_1410356082858">
+        <jpa:attributes>
+            <jpa:id name="id" attribute-type="Long" visibile="true" id="_141035609366556">
+                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
+                <jpa:generated-value strategy="IDENTITY"/>
+            </jpa:id>
+            <jpa:basic name="name" attribute-type="String" visibile="true" id="_141035609475457">
                 <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
             </jpa:basic>
         </jpa:attributes>
     </jpa:entity>
-    <jpa:entity class="RequestType" minimized="false" id="_1410356082858">
+    <jpa:entity class="TaskStatus" visibile="true" minimized="false" id="_1410455181380">
         <jpa:attributes>
-            <jpa:id name="id" attribute-type="Long" id="_141035609366556">
+            <jpa:id name="id" attribute-type="Long" visibile="true" id="_1410455195231119">
                 <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
                 <jpa:generated-value strategy="IDENTITY"/>
             </jpa:id>
-            <jpa:basic name="name" attribute-type="String" id="_141035609475457">
+            <jpa:basic name="name" optional="false" attribute-type="String" visibile="true" id="_1410455198007120">
                 <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
             </jpa:basic>
-        </jpa:attributes>
-    </jpa:entity>
-    <jpa:entity class="TaskStatus" minimized="false" id="_1410455181380">
-        <jpa:attributes>
-            <jpa:id name="id" attribute-type="Long" id="_1410455195231119">
-                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
-                <jpa:generated-value strategy="IDENTITY"/>
-            </jpa:id>
-            <jpa:basic name="name" optional="false" attribute-type="String" id="_1410455198007120">
-                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
-            </jpa:basic>
-            <jpa:basic name="code" attribute-type="int" id="_141081824387911">
+            <jpa:basic name="code" attribute-type="int" visibile="true" id="_141081824387911">
                 <jpa:column unique="true" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
             </jpa:basic>
         </jpa:attributes>
@@ -82,7 +88,7 @@
                 <Bounds x="163.0" y="75.0" width="130.0" height="241.0"/>
             </shape>
             <shape elementRef="_1410356030572" id="_1410356030572_gui">
-                <Bounds x="351.0" y="11.0" width="174.0" height="108.0"/>
+                <Bounds x="351.0" y="11.0" width="174.0" height="148.0"/>
             </shape>
             <shape elementRef="_1410356082858" id="_1410356082858_gui">
                 <Bounds x="348.0" y="379.0" width="176.0" height="88.0"/>

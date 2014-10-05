@@ -14,7 +14,9 @@ import java.util.Map;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -58,20 +60,35 @@ public class UtenderHttpCommon {
     }
 
     public static DateTime getTime() {
-        DateTime dateTime = new DateTime();
-        try {
-            Client client = ClientBuilder.newClient();
-            javax.ws.rs.core.Response response = client.target("http://utender.ru/public/services/datetime/GetDateTime")
-                    .request(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    //.header("Content-Type", "application/json")
-                    .post(Entity.json(""));
-            dateTime = new DateTime(response.getDate());
-            response.close();
-        } catch (Exception ex) {
-            logger.warn("Ошибка получения времени Utender.", ex);
+
+        DateTime result = null;
+        DateTime cur;
+        Client client = ClientBuilder.newClient();
+        Invocation.Builder builder = client.target("http://utender.ru/public/services/datetime/GetDateTime")
+                .request(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        Response response = null;
+        while (true) {
+            try {
+                response = builder.post(Entity.json(""));
+                cur = new DateTime(response.getDate());
+                if (result == null) {
+                    result = cur;
+                }
+                if (cur.isAfter(result)) {
+                    return cur;
+                }
+                //logger.debug("Server time is: {}, current result time is {}", cur, result);
+            } catch (Exception ex) {
+                logger.warn("Ошибка при попытке получить данные о вермени отсервера utender: {}.", ex.getMessage());
+            } finally {
+                if (response != null) {
+                    response.close();
+                }
+            }
         }
-        return dateTime;
+
     }
 
     private static final Logger logger = LoggerFactory.getLogger(UtenderHttpCommon.class.getName());

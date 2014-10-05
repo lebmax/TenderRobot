@@ -59,13 +59,13 @@ public class Timer {
                     }
                     logger.debug("Mill to execute: {}", diff);
 
-                    Future<BasicCookieStore> cookiesFutureCont = null;
+                    Future<BasicCookieStore> cookiesFutureCont;
                     UtenderTask utask = new UtenderTask(task);
 
                     if (diff < 0) {
-                        cookiesFutureCont = authService.getCookies(new Date());
+                        cookiesFutureCont = authService.getCookies();
                     } else {
-                        cookiesFutureCont = authService.getCookies(task.getBeginDate());
+                        cookiesFutureCont = authService.getCookies();
                     }
                     utask.setCookiesFutureCont(cookiesFutureCont);
                     utask.setRequestFutureCont(utenderLogic.prepare(cookiesFutureCont, task));

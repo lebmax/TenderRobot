@@ -42,7 +42,7 @@ public class UtenderAuth {
 
     @Asynchronous
     @Lock(LockType.WRITE)
-    public Future<BasicCookieStore> getCookies(Date date) throws Exception {
+    public Future<BasicCookieStore> getCookies() throws Exception {
 
         logger.debug("Getting cookies");
         try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();) {

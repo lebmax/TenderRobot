@@ -76,6 +76,8 @@ public class UtenderTask implements Callable<Task> {
                 Document doc = Jsoup.parse(entity.getContent(), "utf-8", task.getUrl());
                 Elements errorsCont = doc.getElementsByAttributeValue("id", "ctl00_ctl00_MainContent_ContentPlaceHolderMiddle_ctl00_BidsValidationSummary");
                 
+                UtenderHttpCommon.saveResponse(doc, "sendRequestResponse.html");
+                
                 if(!errorsCont.isEmpty()){
                     StringBuilder sb = new StringBuilder("Запрос не прошел валидацию на сервере.\n");
                     Elements errorList = errorsCont.get(0).getElementsByTag("li");
@@ -86,7 +88,6 @@ public class UtenderTask implements Callable<Task> {
                     
                     throw new Exception(sb.toString());
                 }
-                UtenderHttpCommon.saveResponse(doc, "sendRequestResponse.html");
                 EntityUtils.consume(entity);
                 return task;
             }
