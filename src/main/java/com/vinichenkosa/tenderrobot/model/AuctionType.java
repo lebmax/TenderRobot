@@ -16,6 +16,10 @@ public  class AuctionType implements Serializable {
 
     @Column(nullable = false)
     @Basic
+    private String password;
+
+    @Column(nullable = false)
+    @Basic
     private String name;
 
     @Column(nullable = false)
@@ -25,10 +29,22 @@ public  class AuctionType implements Serializable {
 
     @Column(nullable = false)
     @Basic
+    private String login;
+
+    @Column(nullable = false)
+    @Basic
     private String url;
 
     public AuctionType() {
 
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getName() {
@@ -45,6 +61,14 @@ public  class AuctionType implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getLogin() {
+        return this.login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getUrl() {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<jpa:entity-mappings persistenceUnitName="TenderRobotPU" id="_14102643571281" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_1.xsd" xmlns:java="http://jcp.org/en/jsr/detail?id=270" xmlns:jpa="http://java.sun.com/xml/ns/persistence/orm" xmlns:ns4="http://nbmodeler.java.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<jpa:entity-mappings theme="MAC" persistenceUnitName="TenderRobotPU" id="_14102643571281" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_1.xsd" xmlns:java="http://jcp.org/en/jsr/detail?id=270" xmlns:jpa="http://java.sun.com/xml/ns/persistence/orm" xmlns:ns4="http://nbmodeler.java.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <jpa:package>com.vinichenkosa.tenderrobot.model</jpa:package>
     <jpa:schema>TENDER_ROBOT</jpa:schema>
     <jpa:entity class="Task" visibile="true" minimized="false" id="_1410264369240">
@@ -50,10 +50,10 @@
                 <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
             </jpa:basic>
             <jpa:basic name="login" attribute-type="String" visibile="true" id="_141251599043111">
-                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255"/>
+                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
             </jpa:basic>
             <jpa:basic name="password" attribute-type="String" visibile="true" id="_141251599318812">
-                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255"/>
+                <jpa:column unique="false" nullable="false" insertable="true" updatable="true" length="255" precision="0" scale="0"/>
             </jpa:basic>
         </jpa:attributes>
     </jpa:entity>

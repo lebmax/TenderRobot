@@ -13,7 +13,7 @@ import javax.persistence.NamedQuery;
 
 @Entity
 @NamedQueries(value = {
-@NamedQuery(name = "TaskStatus.findByCode", query = "select s from TaskStatus s where s.code = :code")
+    @NamedQuery(name = "TaskStatus.findByCode", query = "select s from TaskStatus s where s.code = :code")
 })
 public class TaskStatus implements Serializable {
 

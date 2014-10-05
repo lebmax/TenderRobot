@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.Cache;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -59,7 +58,7 @@ public class Task implements Serializable {
 
     @OneToOne(targetEntity = TaskStatus.class)
     private TaskStatus status;
-    
+
     @Transient
     private Boolean success;
 
@@ -146,6 +145,5 @@ public class Task implements Serializable {
     public void setSuccess(Boolean success) {
         this.success = success;
     }
-    
 
 }
