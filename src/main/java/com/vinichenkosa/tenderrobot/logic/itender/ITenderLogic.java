@@ -1,4 +1,4 @@
-package com.vinichenkosa.tenderrobot.logic.utender;
+package com.vinichenkosa.tenderrobot.logic.itender;
 
 import com.impulsm.signatureutils.container.PKCS7Container;
 import com.impulsm.signatureutils.exceptions.KeystoreInitializationException;
@@ -7,7 +7,7 @@ import com.impulsm.signatureutils.keystore.KeystoreTypes;
 import com.impulsm.signatureutils.signature.GOSTSignature;
 import static com.programmisty.numerals.Numerals.russianRubles;
 import com.vinichenkosa.tenderrobot.model.Task;
-import com.vinichenkosa.tenderrobot.model.utender.UtenderHttpCommon;
+import com.vinichenkosa.tenderrobot.model.itender.ITenderHttpCommon;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 
 @Singleton
 @Lock(LockType.WRITE)
-public class UtenderLogic {
+public class ITenderLogic {
 
     @Asynchronous
     public Future<HttpPost> prepare(Future<BasicCookieStore> cookiesFutureCont, Task task) throws Exception {
@@ -86,7 +86,7 @@ public class UtenderLogic {
     private Map<String, String> loadRequest(Task task, CloseableHttpClient httpClient, HttpClientContext context) throws IOException {
 
         HttpGet httpget = new HttpGet(task.getUrl());
-        UtenderHttpCommon.addGetHeaders(httpget);
+        ITenderHttpCommon.addGetHeaders(httpget);
 
         try (CloseableHttpResponse response = httpClient.execute(httpget, context)) {
 
@@ -95,7 +95,7 @@ public class UtenderLogic {
             try (InputStream content = response.getEntity().getContent()) {
 
                 Document doc = Jsoup.parse(content, "utf-8", task.getUrl());
-                UtenderHttpCommon.saveResponse(doc, "loadRequestResponse.html");
+                ITenderHttpCommon.saveResponse(doc, "loadRequestResponse.html");
 
                 Elements inputs = doc.select("input");
 
@@ -148,13 +148,13 @@ public class UtenderLogic {
         params.remove("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign");
 
         HttpPost requestToSend = new HttpPost(task.getUrl());
-        UtenderHttpCommon.addPostHeaders(requestToSend);
-        UrlEncodedFormEntity form = UtenderHttpCommon.addFormParams(params);
+        ITenderHttpCommon.addPostHeaders(requestToSend);
+        UrlEncodedFormEntity form = ITenderHttpCommon.addFormParams(params);
         requestToSend.setEntity(form);
         return requestToSend;
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(UtenderLogic.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ITenderLogic.class.getName());
 
     private String prepareDataToSign(String url, String bidValue, CloseableHttpClient httpClient, HttpClientContext context) throws IOException {
 
@@ -173,7 +173,7 @@ public class UtenderLogic {
         logger.debug("Lot info url: {}", url);
 
         HttpGet httpget = new HttpGet(url);
-        UtenderHttpCommon.addGetHeaders(httpget);
+        ITenderHttpCommon.addGetHeaders(httpget);
 
         try (CloseableHttpResponse response = httpClient.execute(httpget, context)) {
 
@@ -181,7 +181,7 @@ public class UtenderLogic {
             try (InputStream content = response.getEntity().getContent()) {
 
                 Document doc = Jsoup.parse(content, "utf-8", url);
-                UtenderHttpCommon.saveResponse(doc, "lotInfoResponse.html");
+                ITenderHttpCommon.saveResponse(doc, "lotInfoResponse.html");
 
                 String purchaseNumber = findInfo(doc, "Информация о публичном предложении №([\\d]+)");
                 String purchaseTitle = doc.getElementById("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$vcContractDetails").

@@ -42,7 +42,7 @@ public class UtenderHttpCommonTest {
     @Test
     public void testGetTime() {
         System.out.println("getTime");
-        DateTime result = UtenderHttpCommon.getTime();
+        DateTime result = UtenderHttpCommon.getTime("http://utender.ru/");
         System.out.println("Result is " + result);
         assertThat(result, notNullValue());
 

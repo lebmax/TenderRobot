@@ -28,6 +28,35 @@
                 <span ng-show="form.auctionUrl.$error.required && form.auctionUrl.$dirty" class="help-block">Enter auction url</span>
                 <span ng-show="form.auctionUrl.$error.url && form.auctionUrl.$dirty" class="help-block">This is not a valid url.</span>
             </div>
+            
+            <div class="form-group"
+                 ng-class="{'has-error': form.login.$error.required && form.login.$dirty,
+                            'has-success': !form.login.$invalid
+                            }">
+                <label for="login" class="col-sm-2 control-label">Логин:</label>
+                <div class="col-sm-5">
+                    <input type="text" class="form-control" placeholder="Логин для авторизации на площадке"
+                           id="login" name="login" ng-model="auction.login"
+                           required/>
+                </div>
+
+                <span ng-show="form.login.$error.required && form.login.$dirty" class="help-block">Enter login</span>
+            </div>
+            
+            <div class="form-group"
+                 ng-class="{'has-error': form.password.$error.required && form.password.$dirty,
+                            'has-success': !form.password.$invalid
+                            }">
+                <label for="password" class="col-sm-2 control-label">Пароль:</label>
+                <div class="col-sm-5">
+                    <input type="password" class="form-control" placeholder="Пароль для авторизации на площадке"
+                           id="password" name="password" ng-model="auction.password"
+                           required/>
+                </div>
+
+                <span ng-show="form.password.$error.required && form.password.$dirty" class="help-block">Enter auction url</span>
+            </div>
+            
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-5">
                     <a href="#/task" class="btn btn-primary">Назад</a>

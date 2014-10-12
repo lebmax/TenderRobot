@@ -1,9 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package com.vinichenkosa.tenderrobot.model.utender;
+package com.vinichenkosa.tenderrobot.model.itender;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,7 +23,7 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UtenderHttpCommon {
+public class ITenderHttpCommon {
 
     public static void addPostHeaders(HttpPost method) {
         method.addHeader("Cache-Control", "max-age=0");
@@ -91,5 +86,5 @@ public class UtenderHttpCommon {
 
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(UtenderHttpCommon.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ITenderHttpCommon.class.getName());
 }

@@ -1,13 +1,12 @@
 package com.vinichenkosa.tenderrobot.timers;
 
-import com.vinichenkosa.tenderrobot.logic.utender.UtenderLogic;
+import com.vinichenkosa.tenderrobot.logic.itender.ITenderLogic;
 import com.vinichenkosa.tenderrobot.model.Task;
-import com.vinichenkosa.tenderrobot.model.utender.UtenderAuth;
+import com.vinichenkosa.tenderrobot.model.itender.ITenderAuth;
 import com.vinichenkosa.tenderrobot.model.utender.UtenderHttpCommon;
 import com.vinichenkosa.tenderrobot.model.utender.UtenderTask;
 import com.vinichenkosa.tenderrobot.service.TaskFacadeREST;
 import com.vinichenkosa.tenderrobot.service.TaskStatusFacadeREST;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,9 +31,9 @@ public class Timer {
     @Inject
     private TaskStatusFacadeREST taskStatusFacade;
     @Inject
-    private UtenderAuth authService;
+    private ITenderAuth authService;
     @Inject
-    private UtenderLogic utenderLogic;
+    private ITenderLogic itenderLogic;
     private final ConcurrentHashMap<Task, ScheduledFuture<Task>> futures = new ConcurrentHashMap<>();
     //private ConcurrentLinkedQueue<UtenderTask> tasksToPrepare = new ConcurrentLinkedQueue<>();
 
@@ -51,7 +50,7 @@ public class Timer {
             for (Task task : tasksToExecute) {
                 try {
 
-                    long diff = task.getBeginDate().getTime() - UtenderHttpCommon.getTime().getMillis();
+                    long diff = task.getBeginDate().getTime() - UtenderHttpCommon.getTime(task.getUrl()).getMillis();
 
                     if (diff > 300000) {
                         //logger.debug("No tasks to execute");
@@ -63,12 +62,12 @@ public class Timer {
                     UtenderTask utask = new UtenderTask(task);
 
                     if (diff < 0) {
-                        cookiesFutureCont = authService.getCookies();
+                        cookiesFutureCont = authService.getCookies(task);
                     } else {
-                        cookiesFutureCont = authService.getCookies();
+                        cookiesFutureCont = authService.getCookies(task);
                     }
                     utask.setCookiesFutureCont(cookiesFutureCont);
-                    utask.setRequestFutureCont(utenderLogic.prepare(cookiesFutureCont, task));
+                    utask.setRequestFutureCont(itenderLogic.prepare(cookiesFutureCont, task));
 
                     ScheduledFuture<Task> f = executor.schedule(utask, diff, TimeUnit.MILLISECONDS);
                     logger.debug("Task {} scheduled", task);
