@@ -1,7 +1,6 @@
 package com.vinichenkosa.tenderrobot.model.itender;
 
-import com.vinichenkosa.tenderrobot.model.utender.*;
-import com.vinichenkosa.tenderrobot.logic.utender.UtenderLogic;
+import com.vinichenkosa.tenderrobot.logic.itender.ITenderLogic;
 import com.vinichenkosa.tenderrobot.model.Task;
 import java.io.IOException;
 import java.util.Date;
@@ -59,7 +58,7 @@ public class ITenderTask implements Callable<Task> {
             HttpPost request = requestFutureCont.get();
             if (request == null) {
                 logger.debug("Request not formed. Trying again...");
-                UtenderLogic requestFactory = lookupUtenderLogicBean();
+                ITenderLogic requestFactory = lookupUtenderLogicBean();
                 requestFutureCont = requestFactory.prepare(cookiesFutureCont, task);
                 while (!requestFutureCont.isDone()) {
                 }
@@ -110,7 +109,7 @@ public class ITenderTask implements Callable<Task> {
                 throw new Exception("Не было отправлено ни одного запроса, либо не было получено ни одного ответа.");
             }
 
-            UtenderHttpCommon.saveResponse(doc, "sendRequestResponse.html");
+            ITenderHttpCommon.saveResponse(doc, "sendRequestResponse.html");
             StringBuilder sb = new StringBuilder("Запрос не прошел валидацию на сервере.\n");
             Elements errorList = errorsCont.get(0).getElementsByTag("li");
             sb.append("Ответ от сервера содержит ").append(errorList.size()).append(" ошибок.\n");
@@ -145,10 +144,10 @@ public class ITenderTask implements Callable<Task> {
         this.requestFutureCont = requestFutureCont;
     }
 
-    private UtenderLogic lookupUtenderLogicBean() {
+    private ITenderLogic lookupUtenderLogicBean() {
         try {
             Context c = new InitialContext();
-            return (UtenderLogic) c.lookup("java:global/TenderRobot/UtenderLogic");
+            return (ITenderLogic) c.lookup("java:global/TenderRobot/ITenderLogic");
         } catch (NamingException ne) {
             java.util.logging.Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);

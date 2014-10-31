@@ -2,9 +2,10 @@ package com.vinichenkosa.tenderrobot.timers;
 
 import com.vinichenkosa.tenderrobot.logic.itender.ITenderLogic;
 import com.vinichenkosa.tenderrobot.model.Task;
+import com.vinichenkosa.tenderrobot.model.arbitat.ArbitatAuth;
 import com.vinichenkosa.tenderrobot.model.itender.ITenderAuth;
-import com.vinichenkosa.tenderrobot.model.utender.UtenderHttpCommon;
-import com.vinichenkosa.tenderrobot.model.utender.UtenderTask;
+import com.vinichenkosa.tenderrobot.model.itender.ITenderHttpCommon;
+import com.vinichenkosa.tenderrobot.model.itender.ITenderTask;
 import com.vinichenkosa.tenderrobot.service.TaskFacadeREST;
 import com.vinichenkosa.tenderrobot.service.TaskStatusFacadeREST;
 import java.util.Enumeration;
@@ -33,6 +34,8 @@ public class Timer {
     @Inject
     private ITenderAuth authService;
     @Inject
+    private ArbitatAuth arbitatAuthService;
+    @Inject
     private ITenderLogic itenderLogic;
     private final ConcurrentHashMap<Task, ScheduledFuture<Task>> futures = new ConcurrentHashMap<>();
     //private ConcurrentLinkedQueue<UtenderTask> tasksToPrepare = new ConcurrentLinkedQueue<>();
@@ -50,7 +53,7 @@ public class Timer {
             for (Task task : tasksToExecute) {
                 try {
 
-                    long diff = task.getBeginDate().getTime() - UtenderHttpCommon.getTime(task.getUrl()).getMillis();
+                    long diff = task.getBeginDate().getTime() - ITenderHttpCommon.getTime(task.getUrl()).getMillis();
 
                     if (diff > 300000) {
                         //logger.debug("No tasks to execute");
@@ -59,17 +62,17 @@ public class Timer {
                     logger.debug("Mill to execute: {}", diff);
 
                     Future<BasicCookieStore> cookiesFutureCont;
-                    UtenderTask utask = new UtenderTask(task);
+                    ITenderTask itask = new ITenderTask(task);
 
-                    if (diff < 0) {
-                        cookiesFutureCont = authService.getCookies(task);
+                    if (task.getAuctionType().getId() == 6) {
+                        cookiesFutureCont = arbitatAuthService.getCookies(task);
                     } else {
                         cookiesFutureCont = authService.getCookies(task);
                     }
-                    utask.setCookiesFutureCont(cookiesFutureCont);
-                    utask.setRequestFutureCont(itenderLogic.prepare(cookiesFutureCont, task));
+                    itask.setCookiesFutureCont(cookiesFutureCont);
+                    itask.setRequestFutureCont(itenderLogic.prepare(cookiesFutureCont, task));
 
-                    ScheduledFuture<Task> f = executor.schedule(utask, diff, TimeUnit.MILLISECONDS);
+                    ScheduledFuture<Task> f = executor.schedule(itask, diff, TimeUnit.MILLISECONDS);
                     logger.debug("Task {} scheduled", task);
                     futures.put(task, f);
                     logger.debug("Task {} added to future", task);

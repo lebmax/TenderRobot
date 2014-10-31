@@ -1,9 +1,12 @@
-package com.vinichenkosa.tenderrobot.model.utender;
+package com.vinichenkosa.tenderrobot.model.arbitat;
 
+import com.vinichenkosa.tenderrobot.model.itender.*;
 import com.vinichenkosa.tenderrobot.model.Task;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import javax.ejb.AsyncResult;
 import javax.ejb.Asynchronous;
@@ -28,21 +31,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class UtenderAuth {
+@Lock(LockType.READ)
+public class ArbitatAuth {
 
-    private final BasicCookieStore cookieStore = new BasicCookieStore();
-    private final Logger logger = LoggerFactory.getLogger(UtenderAuth.class.getName());
+    private final ConcurrentHashMap<Task, BasicCookieStore> cookiesMap = new ConcurrentHashMap<>();
+    private final Logger logger = LoggerFactory.getLogger(ArbitatAuth.class.getName());
     //private Map<String, String> cookies = new HashMap<>();
 
     @Asynchronous
-    @Lock(LockType.WRITE)
     public Future<BasicCookieStore> getCookies(Task t) throws Exception {
 
         logger.debug("Getting cookies");
+        cookiesMap.putIfAbsent(t, new BasicCookieStore());
+        BasicCookieStore cookieStore = cookiesMap.get(t);
         try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();) {
 
             logger.debug("Loading main page for authorization");
-            Map<String, String> params = loadMain(httpclient, t);
+            Map<String, String> params = loadAuth(httpclient, t);
 
             if (params.get("ctl00$ctl00$LeftContentLogin$ctl00$Login1$UserName") == null) {
                 logger.debug("Куки уже установлены.");
@@ -55,12 +60,12 @@ public class UtenderAuth {
         return new AsyncResult<>(cookieStore);
     }
 
-    private Map<String, String> loadMain(CloseableHttpClient httpclient, Task t) 
+    private Map<String, String> loadAuth(CloseableHttpClient httpclient, Task t) 
             throws Exception {
 
         HttpClientContext context = HttpClientContext.create();
-        context.setCookieStore(cookieStore);
-        HttpGet httpget = new HttpGet(t.getUrl());
+        context.setCookieStore(cookiesMap.get(t));
+        HttpGet httpget = new HttpGet(t.getAuctionType().getUrl()+"/public/register-party/");
 
         try (CloseableHttpResponse response = httpclient.execute(httpget, context)) {
 
@@ -76,6 +81,12 @@ public class UtenderAuth {
                         case "Очистить":
                             break;
                         case "Искать":
+                            break;
+                        case "Запустить проверку":
+                            break;
+                        case "Инструкция по настройке браузера":
+                            break;
+                        case "":
                             break;
                         default:
                             params.put(input.attr("name"), input.attr("value"));
@@ -106,22 +117,28 @@ public class UtenderAuth {
         params.put("ctl00$ctl00$LeftContentLogin$ctl00$Login1$Password", t.getAuctionType().getPassword());
         params.put("__EVENTTARGET", "");
         params.put("__EVENTARGUMENT", "");
-        params.put("hiddenInputToUpdateATBuffer_CommonToolkitScripts", "1");
-        params.put("ctl00$ctl00$MainExpandableArea$phExpandCollapse$scPurchaseAllSearch$Purchase_bargainTypeID_Типторгов$ddlBargainType", "10,11,12,111,13");
-
-        HttpPost request = new HttpPost(t.getAuctionType().getUrl());
-        UtenderHttpCommon.addPostHeaders(request);
-        UrlEncodedFormEntity form = UtenderHttpCommon.addFormParams(params);
+        
+        HttpPost request = new HttpPost(t.getAuctionType().getUrl()+"/public/register-party/");
+        
+        logger.debug("Params to send request fot auth:");
+        
+        Set<String> keys = params.keySet();
+        for (String key : keys) {
+            logger.debug("Param {} = {}", key, params.get(key));
+        }
+        
+        ITenderHttpCommon.addPostHeaders(request);
+        UrlEncodedFormEntity form = ITenderHttpCommon.addFormParams(params);
         request.setEntity(form);
 
         HttpClientContext context = HttpClientContext.create();
-        context.setCookieStore(cookieStore);
+        context.setCookieStore(cookiesMap.get(t));
 
         try (CloseableHttpResponse response = httpclient.execute(request, context)) {
 
             HttpEntity entity = response.getEntity();
             Document doc = Jsoup.parse(entity.getContent(), "utf-8", t.getUrl());
-            UtenderHttpCommon.saveResponse(doc, "sendAuthResponse.html");
+            ITenderHttpCommon.saveResponse(doc, "sendAuthResponse.html");
             EntityUtils.consume(entity);
 
         }

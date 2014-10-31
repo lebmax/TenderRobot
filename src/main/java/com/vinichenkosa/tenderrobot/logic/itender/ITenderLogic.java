@@ -64,18 +64,13 @@ public class ITenderLogic {
             CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookies).build();
             Map<String, String> params = loadRequest(task, httpClient, context);
 
-            String dataToSign = params.get("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign");
-            if (dataToSign == null) {
+//            String dataToSign = params.get("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign");
+//            if (dataToSign == null) {
+                logger.debug("Нет данных для подписи. Подготавливаем...");
                 String bid = params.get("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$ecRequest$purchasePartyRequest_priceProposal_Моёпредложениеруб");
-                dataToSign = prepareDataToSign(task.getUrl(), bid, httpClient, context);
+                String dataToSign = prepareDataToSign(task.getUrl(), bid, httpClient, context);
                 params.put("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign", dataToSign);
-            }
-            
-            Set<String> keys = params.keySet();
-            for (String key : keys) {
-                logger.debug("{} = {}", key, params.get(key));
-            }
-            
+//            }
             return new AsyncResult<>(prepareRequestToSend(params, task));
         } catch (Exception ex) {
             logger.error("Exception: ", ex);
@@ -122,7 +117,6 @@ public class ITenderLogic {
     private HttpPost prepareRequestToSend(Map<String, String> params, Task task) throws KeystoreInitializationException, KeyStoreException, Exception {
 
         //Files.write(Paths.get("/tmp/datatToSign.txt"),params.get("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign").getBytes("utf-16"));
-        
         Keystore keystore = new Keystore();
         keystore.load(KeystoreTypes.RutokenStore);
 //        keystore.load(KeystoreTypes.HDImageStore);
@@ -146,6 +140,12 @@ public class ITenderLogic {
         params.put("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$hfProposalDone", "1");
         params.remove("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidSignedData");
         params.remove("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$scRequest$hidDataToSign");
+
+        logger.debug("Параметры для отправки заявки:");
+        Set<String> keys = params.keySet();
+        for (String key : keys) {
+            logger.debug("{} = {}", key, params.get(key));
+        }
 
         HttpPost requestToSend = new HttpPost(task.getUrl());
         ITenderHttpCommon.addPostHeaders(requestToSend);
@@ -192,11 +192,11 @@ public class ITenderLogic {
                 String lotTitle = doc.getElementById("ctl00$ctl00$MainContent$ContentPlaceHolderMiddle$ctl00$vcPurchaseLot").getElementsByTag("tr").get(1).getElementsByTag("td").get(1).text();
 
                 try (InputStream is = getClass().getClassLoader().getResourceAsStream("dataToSignTpl.xml");) {
-                    
-                    if(is == null){
+
+                    if (is == null) {
                         throw new IOException("Файл dataToSignTpl.xml не найден в ClassPath");
                     }
-                    
+
                     String datatToSign = IOUtils.toString(is, "utf-16");
                     datatToSign = datatToSign.replaceAll("\\{lotTitle\\}", lotTitle);
                     datatToSign = datatToSign.replaceAll("\\{lotNumber\\}", lotNumber);
